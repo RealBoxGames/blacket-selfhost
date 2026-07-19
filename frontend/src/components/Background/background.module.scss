@@ -1,0 +1,40 @@
+.background {
+    --gradient-stops: rgba(0, 0, 0, 0.33) 0%, rgba(0, 0, 0, 0.15) 50%, rgba(0, 0, 0, 0.05) 100%;
+    --blooks-transform: translate(-50%, -50%) rotate(15deg);
+
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    z-index: -2;
+}
+
+.backgroundBlooks {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: 50%;
+    left: 50%;
+    background-size: 100px;
+    background-position: -100px -100px;
+    opacity: var(--background-opacity);
+    -webkit-transform: var(--blooks-transform);
+    transform: var(--blooks-transform);
+    -webkit-filter: brightness(100);
+    filter: brightness(100);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+.backgroundGradient {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: -webkit-linear-gradient(140deg, var(--gradient-stops));
+    background: linear-gradient(140deg, var(--gradient-stops));
+    z-index: 1;
+}

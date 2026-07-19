@@ -1,0 +1,23 @@
+{
+    "name": "@blacket/common",
+    "version": "0.0.1",
+    "description": "",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "/dist"
+    ],
+    "scripts": {
+        "build": "tsgo",
+        "build:declaration": "tsgo --declaration --emitDeclarationOnly"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@types/node": "^22.10.6"
+    },
+    "devDependencies": {
+        "@typescript/native-preview": "^7.0.0-dev.20260626.1"
+    }
+}

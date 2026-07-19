@@ -1,0 +1,98 @@
+.container {
+    position: fixed;
+    background-color: var(--primary-color);
+    width: 250px;
+    height: fit-content;
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    box-shadow: inset 0 -7px rgba(0, 0, 0, 0.2), 0 0 4px rgba(0, 0, 0, 0.15);
+    padding: 2px 0 7px 0;
+    border-radius: var(--border-radius);
+
+    @media (max-width: 768px) {
+        bottom: 0;
+        width: 100%;
+        box-shadow: unset;
+        padding: 5px 0 5px 0;
+        border-radius: unset;
+        animation: slideInFromBottom .3s ease;
+
+        @keyframes slideInFromBottom {
+            0% {
+                transform: translateY(100%);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    padding: 10px;
+    color: var(--accent-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+    }
+
+    &>span {
+        width: 100%;
+    }
+
+    &>i {
+        margin-left: 10px;
+    }
+
+    &>img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    @media (max-width: 768px) {
+        border-radius: unset;
+    }
+}
+
+.divider {
+    height: 2px;
+    background: var(--accent-color);
+    margin: 5px;
+    border-radius: var(--border-radius);
+    opacity: 0.25;
+}
+
+.mobileModal {
+    display: none;
+
+    @media (max-width: 768px) {
+        display: block;
+        position: fixed;
+        z-index: 15;
+        left: 0;
+        top: 0;
+        opacity: 1;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0);
+        animation: fadeBackgroundIn .3s ease forwards;
+
+        @keyframes fadeBackgroundIn {
+            0% {
+                background-color: rgba(0, 0, 0, 0);
+            }
+            100% {
+                background-color: rgba(0, 0, 0, 0.6);
+            }
+        }
+    }
+}

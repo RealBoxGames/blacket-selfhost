@@ -1,0 +1,11 @@
+{
+    "prisma.pinToPrisma6": true,
+    "js/ts.tsdk.path": "frontend/node_modules/typescript/lib",
+    "editor.quickSuggestionsDelay": 0,
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "on",
+        "strings": "on"
+    },
+    // "js/ts.experimental.useTsgo": true
+}

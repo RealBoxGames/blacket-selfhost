@@ -1,0 +1,42 @@
+enum RewardType {
+    ITEM
+    BLOOK
+    TITLE
+    FONT
+    BANNER
+
+    TOKENS
+    DIAMONDS
+    CRYSTALS
+}
+
+model Reward {
+    id Int @id @default(autoincrement())
+
+    name String?
+
+    type RewardType
+
+    quantity Int @default(1)
+
+    itemId   Int?
+    blookId  Int?
+    titleId  Int?
+    fontId   Int?
+    bannerId Int?
+
+    shinyChance Float?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    item   Item?   @relation(fields: [itemId], references: [id], onDelete: SetNull)
+    blook  Blook?  @relation(fields: [blookId], references: [id], onDelete: SetNull)
+    title  Title?  @relation(fields: [titleId], references: [id], onDelete: SetNull)
+    font   Font?   @relation(fields: [fontId], references: [id], onDelete: SetNull)
+    banner Banner? @relation(fields: [bannerId], references: [id], onDelete: SetNull)
+
+    products           Product[]
+    subscriptions      Subscription[]
+    spinnyWheelRewards SpinnyWheelReward[]
+}

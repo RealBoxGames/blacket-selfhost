@@ -1,0 +1,28 @@
+model Product {
+    id                   Int      @id @default(autoincrement())
+    name                 String
+    subname              String?
+    tag                  String?
+    subtag               String?
+    description          String?
+    price                Float?
+    discount             Float?   @default(0)
+    imageId              Int
+    fontId               Int?
+    color1               String
+    color2               String
+    rewards              Reward[]
+    isQuantityCapped     Boolean? @default(false)
+    isPriceUsingCrystals Boolean  @default(false)
+    priority             Int      @default(0)
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    image Resource? @relation(fields: [imageId], references: [id])
+    font  Font?     @relation(fields: [fontId], references: [id])
+
+    stores       Store[]
+    transactions Transaction[]
+}

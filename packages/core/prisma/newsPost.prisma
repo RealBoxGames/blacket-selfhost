@@ -1,0 +1,16 @@
+model NewsPost {
+    id      Int    @id @default(autoincrement())
+    title   String
+    content String
+
+    imageId  Int?
+    authorId String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    image  Upload? @relation(fields: [imageId], references: [id], onDelete: SetNull)
+    author User    @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+    votes UserNewsPostVote[]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "blacket-rewrite-bot",
+  "version": "1.0.0",
+  "description": "rewrite bot",
+  "main": "dist/index.js",
+  "types": "typings/environment.d.ts",
+  "scripts": {
+    "dev": "bun --watch ./src/index.ts",
+    "dev:attach": "bun --inspect-wait=localhost:6499/ ./src/index.ts",
+    "build": "tsc",
+    "start": "node .",
+    "clean": "rimraf dist",
+    "prisma:gen": "prisma generate --schema prisma",
+    "deploy": "bun ./src/deploy-commands.ts"
+  },
+  "keywords": [],
+  "author": "Syfe",
+  "dependencies": {
+    "@blacket/core": "link:@blacket/core",
+    "@blacket/types": "link:@blacket/types",
+    "@leeoniya/ufuzzy": "^1.0.18",
+    "@napi-rs/canvas": "^0.1.71",
+    "@prisma/client": "5.18.0",
+    "@zastix/prisma-generator-typescript-interfaces": "^1.4.2",
+    "bufferutil": "^4.0.9",
+    "discord-api-types": "^0.37.120",
+    "discord.js": "^14.20.0",
+    "dotenv": "^16.5.0",
+    "ioredis": "^5.6.1",
+    "parse-duration": "^1.1.2",
+    "pg": "^8.16.0",
+    "pg-hstore": "^2.3.4",
+    "reflect-metadata": "^0.2.2",
+    "utf-8-validate": "^6.0.5",
+    "zlib-sync": "^0.1.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.32",
+    "@types/validator": "^13.15.2",
+    "nodemon": "^3.1.10",
+    "rimraf": "^5.0.10",
+    "tslib": "^2.8.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  },
+  "trustedDependencies": [
+    "@blacket/core",
+    "@blacket/types",
+    "@prisma/client",
+    "bufferutil",
+    "esbuild",
+    "utf-8-validate",
+    "zlib-sync"
+  ]
+}

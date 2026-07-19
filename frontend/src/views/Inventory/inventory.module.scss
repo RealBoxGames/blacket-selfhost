@@ -1,0 +1,515 @@
+.leftSide {
+    position: absolute;
+    top: 100px;
+    left: 1%;
+    height: calc(100% - 110px);
+    width: calc(100% - 45vh);
+    border-radius: 10px;
+    background-color: var(--primary-color);
+    padding: 10px 10px 20px;
+    box-shadow: inset 0 0 0 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+
+    &[data-fill="true"] {
+        width: calc(99% - 10px);
+    }
+
+    @media only screen and (max-width: 768px) {
+        top: unset;
+        left: 2.5%;
+        height: calc(45% - 10px);
+        width: 95%;
+        bottom: 5px;
+
+        &[data-fill="true"] {
+            width: 95%;
+        }
+    }
+}
+
+.rightSide {
+    position: absolute;
+    top: 100px;
+    right: 1%;
+    height: calc(100% - 110px);
+    width: 40vh;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 10px;
+    gap: 1vh;
+
+    @media only screen and (max-width: 768px) {
+        top: 10px;
+        left: 2.5%;
+        height: 50%;
+        width: 95%;
+    }
+}
+
+.top {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 50%;
+
+    @media only screen and (max-width: 768px) {
+        height: 40%;
+    }
+}
+
+.topBackgroundImage {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    pointer-events: none;
+
+    &>img {
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 20%;
+        background: linear-gradient(to bottom, transparent 0%, var(--primary-color) 100%);
+        pointer-events: none;
+    }
+
+    @media only screen and (max-width: 768px) {
+        display: none;
+    }
+}
+
+.backgroundImageM {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    pointer-events: none;
+
+    &>img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        filter: blur(2px) brightness(0.5);
+    }
+
+    @media only screen and (min-width: 769px) {
+        display: none;
+    }
+}
+
+.itemContainer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+
+    @media only screen and (max-width: 768px) {
+        display: none;
+    }
+}
+
+.itemContainerM {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    @media only screen and (min-width: 769px) {
+        display: none;
+    }
+}
+
+.basicInfo {
+    position: absolute;
+    top: 1vh;
+    left: 5%;
+    width: 90%;
+    height: 30%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+
+    @media only screen and (max-width: 768px) {
+        display: none;
+    }
+}
+
+.basicInfoM {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 50%;
+    height: 100%;
+    gap: 1vh;
+    padding: 1vh 1vh 0 1vh;
+    user-select: none;
+
+    @media only screen and (min-width: 769px) {
+        display: none;
+    }
+}
+
+.itemName {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--heading-font);
+    // text-shadow: 0.2rem 0.2rem 0 rgba(0, 0, 0, .4);
+    // text outline
+    text-shadow: 0.2rem 0.2rem 0rem rgba(0, 0, 0, .5);
+}
+
+.itemNameM {
+    width: 100%;
+    height: 40%;
+    font-family: var(--heading-font);
+    text-shadow: 0.2rem 0.2rem 0 rgba(0, 0, 0, .2);
+}
+
+.itemDescriptionM {
+    width: 100%;
+    height: 60%;
+    text-shadow: 0.1rem 0.1rem 0 rgba(0, 0, 0, .2);
+}
+
+.rarityLabelContainer {
+    width: 100%;
+    height: 30%;
+    margin-bottom: 2vh;
+    position: relative;
+    top: 1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 1vh;
+}
+
+.rarityLabel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.rarityDivider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1vh;
+    height: 1vh;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+}
+
+.itemImageContainer {
+    position: relative;
+    top: 7%;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.itemImageContainerM {
+    position: relative;
+    height: 100%;
+    right: 1vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+.itemImage {
+    // width: 45%;
+    height: 50%;
+}
+
+.itemImageM {
+    display: flex;
+    justify-content: right;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 95%;
+    height: 50%;
+    font-size: 2vh;
+    z-index: 1;
+    margin: 1.5vh;
+
+    @media only screen and (max-width: 768px) {
+        height: 60%;
+    }
+}
+
+.description {
+    width: 100%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    @media only screen and (max-width: 768px) {
+        display: none;
+    }
+}
+
+.infoContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 60%;
+    font-size: 2vh;
+
+    @media only screen and (max-width: 768px) {
+        max-height: 15vh;
+        overflow-y: auto;
+        line-height: 2.5vh;
+    }
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.infoText {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 1vh;
+
+    &>i {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 2vh;
+    }
+}
+
+.actionsContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 10%;
+
+    @media only screen and (max-width: 768px) {
+        height: 15%;
+    }
+}
+
+.actions {
+    display: flex;
+    gap: 1vh;
+
+    &>* {
+        flex: 1;
+    }
+}
+
+
+
+
+
+.sellBlookExitSell {
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.sellBlooksFlex {
+    display: flex;
+    width: 100%;
+    padding: 20px;
+    gap: 20px;
+    // height: 13.5rem;
+    height: 100%;
+
+    @media only screen and (max-width: 685px) {
+        flex-direction: column;
+        width: unset;
+        height: unset !important;
+    }
+}
+
+.sellBlookBlookName {
+    font-size: 2.25rem;
+    font-weight: 100;
+    font-family: var(--heading-font);
+    margin: 0;
+    width: 100%;
+    height: 65px;
+
+    @media only screen and (max-width: 685px) {
+        margin-bottom: 15px;
+        height: 40px;
+    }
+}
+
+.sellBlookPackName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: var(--paragraph-font);
+    margin: 0;
+}
+
+.sellBlookHoldInput {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+
+    @media screen and (max-width: 768px) {
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.sellBlooksContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sellBlookExtraOptionButton {
+    padding: 4px 10px;
+    background-color: rgba(0, 0, 0, .2);
+    border-radius: var(--border-radius);
+    transition: ease .2s;
+    cursor: pointer;
+    font-weight: 600;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, .1);
+    }
+}
+
+.sellBlookExtraOptions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: -10px;
+}
+
+.sellBlookInput {
+    display: flex;
+    align-items: baseline;
+}
+
+.sellBlooks {
+    width: 15rem;
+    height: 100%;
+    max-height: 15rem;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    border: 5px solid var(--secondary-color);
+    // margin: 20px;
+    border-radius: var(--border-radius);
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    @media only screen and (max-width: 685px) {
+        width: unset;
+        height: 80%;
+    }
+}
+
+.sellBlook {
+    width: 250px;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
+    background-color: rgba(0, 0, 0, .2);
+    padding: 10px;
+    border-radius: var(--border-radius);
+    margin: 10px;
+    cursor: pointer;
+    transition: background-color .2s;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, .4);
+    }
+
+    &[data-selected="true"] {
+        background-color: rgba(255, 255, 255, .4);
+    }
+}
+
+.sellBlookImageContainer {
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.sellBlookImage {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.sellBlookInformation {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    font-weight: 700;
+}
+
+.sellBlooksQuantityContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20rem;
+    text-align: left;
+
+    @media only screen and (max-width: 685px) {
+        width: unset;
+        align-items: center;
+        text-align: center;
+    }
+}

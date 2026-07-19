@@ -1,0 +1,24 @@
+model SpinnyWheel {
+    id   Int    @id @default(autoincrement())
+    name String
+
+    rewards SpinnyWheelReward[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model SpinnyWheelReward {
+    id Int @id @default(autoincrement())
+
+    spinnyWheelId Int
+    spinnyWheel   SpinnyWheel @relation(fields: [spinnyWheelId], references: [id], onDelete: Cascade)
+
+    rewardId Int
+    reward   Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+
+    chance Float
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

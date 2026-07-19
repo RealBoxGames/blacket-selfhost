@@ -1,0 +1,18 @@
+model Title {
+    id         Int         @id @default(autoincrement())
+    name       String      @unique
+    color      String      @default("#ffffff") // supports gradients
+    fontId     Int
+    bold       Boolean     @default(false)
+    italic     Boolean     @default(false)
+    underline  Boolean     @default(false)
+    default    Boolean     @default(false)
+    priority   Int         @default(0)
+    createdAt  DateTime    @default(now())
+    updatedAt  DateTime    @updatedAt
+    font       Font        @relation(fields: [fontId], references: [id])
+    itemShop   ItemShop[]
+    users      UserTitle[]
+    usersUsing User[]
+    rewards    Reward[]
+}

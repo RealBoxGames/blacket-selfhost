@@ -1,0 +1,53 @@
+.purchaseDetailsContainer {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+    width: 100%;
+    max-width: 500px;
+    text-align: left;
+
+    .purchaseDetailsText {
+        opacity: 0.5;
+    }
+}
+
+.purchaseDetails {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 25px;
+    padding: 5px 10px;
+    border-radius: var(--border-radius);
+    background: var(--background-color);
+
+    @media screen and (max-width: 768px) {
+        width: fit-content;
+        gap: 10px;
+        flex-direction: column;
+    }
+}
+
+.productImage {
+    height: 25px;
+    width: 25px;
+    margin-right: 10px;
+    object-fit: contain;
+}
+
+.productCurrencyImage {
+    width: 24px;
+    height: 24px;
+    user-select: none;
+    object-fit: contain;
+}
+
+.productPrice {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.paymentMethodDropdown {
+    width: 100%;
+}

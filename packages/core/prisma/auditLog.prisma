@@ -1,0 +1,24 @@
+// TODO: this needs to be overhauled
+
+enum AuditLogAction {
+    CREATE
+    UPDATE
+    DELETE
+}
+
+model AuditLog {
+    id Int @id @default(autoincrement())
+
+    action   AuditLogAction
+    model    String
+    recordId String
+
+    changes Json?
+
+    actorId String?
+    actor   User?   @relation("auditLogActor", fields: [actorId], references: [id])
+
+    createdAt DateTime @default(now())
+
+    @@index([model, recordId])
+}

@@ -1,0 +1,28 @@
+.planText {
+    display: flex;
+    flex-direction: row;
+    margin: 2px 0;
+    font-size: 26px;
+
+    @media only screen and (max-width:768px) {
+        flex-direction: column;
+    }
+
+    &>div:nth-child(1) {
+    font-family: var(--heading-font);
+        margin-right: 5px;
+        padding-bottom: 3px;
+    }
+
+    &>div:nth-child(2) {
+        font-weight: 700;
+    }
+}
+
+.upgradeButton {
+    margin-top: 10px;
+
+    @media only screen and (max-width:768px) {
+        margin-top: 20px;
+    }
+}

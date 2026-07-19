@@ -1,0 +1,23 @@
+.clearButton {
+    font-size: 20px;
+    width: fit-content;
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    border: 2px solid var(--accent-color);
+    background: rgba(255, 255, 255, 0.1);
+    transition: background-color .2s, color .2s, opacity .2s;
+    text-decoration: none;
+    text-align: center;
+    user-select: none;
+
+    &:hover {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+    }
+
+    &:active {
+        opacity: .7;
+    }
+}
