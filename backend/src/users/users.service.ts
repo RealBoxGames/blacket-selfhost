@@ -228,6 +228,7 @@ export class UsersService implements OnApplicationBootstrap {
                     titleId: this.defaultTitle.id,
                     fontId: this.defaultFont.id,
                     permissions: this.defaultPermissions,
+                    tokens: 1500,
                     crystals: 1000,
                     diamonds: 100,
 
