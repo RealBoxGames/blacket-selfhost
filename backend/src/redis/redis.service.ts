@@ -35,7 +35,12 @@ export class RedisService extends Redis {
     constructor(private readonly coreService: CoreService,
         private readonly prismaService: PrismaService,
         private readonly configService: ConfigService,) {
-        super({});
+        super({
+            host: configService.get<string>("SERVER_REDIS_HOST") || "localhost",
+            port: Number(configService.get<string>("SERVER_REDIS_PORT")) || 6379,
+            password: configService.get<string>("SERVER_REDIS_PASSWORD") || undefined,
+            tls: configService.get<string>("SERVER_REDIS_TLS") === "true" ? {} : undefined
+        });
 
         this.prefix = this.configService.get<string>("SERVER_DATABASE_NAME");
     }
