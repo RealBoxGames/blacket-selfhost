@@ -26,7 +26,7 @@ export const useSocket = create<SocketStore>()(
                     oldSocket.removeAllListeners();
                 }
 
-                const socket = io(`${location.protocol}//${location.host}`, {
+                const socket = io(import.meta.env.VITE_BACKEND_URL, {
                     path: "/gateway",
                     auth: { token: localStorage.getItem("token") },
                     transports: ["websocket"]

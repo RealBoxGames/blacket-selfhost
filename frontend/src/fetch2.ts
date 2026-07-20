@@ -7,7 +7,9 @@ export enum HTTPMethod {
     PATCH = "PATCH"
 }
 
-const fetchInterceptor = (method: HTTPMethod) => (url: string, body: JSON) => new Promise((resolve, reject) => window.fetch(url, {
+const resolveUrl = (url: string) => url.startsWith("/") ? `${import.meta.env.VITE_BACKEND_URL}${url}` : url;
+
+const fetchInterceptor = (method: HTTPMethod) => (url: string, body: JSON) => new Promise((resolve, reject) => window.fetch(resolveUrl(url), {
     method,
     headers: {
         "Content-Type": "application/json",
@@ -31,7 +33,7 @@ const fetchInterceptor = (method: HTTPMethod) => (url: string, body: JSON) => ne
     })
     .catch((error) => reject(error)));
 
-const fetchUploadInterceptor = (method: HTTPMethod) => (url: string, body: FormData) => new Promise((resolve, reject) => window.fetch(url, {
+const fetchUploadInterceptor = (method: HTTPMethod) => (url: string, body: FormData) => new Promise((resolve, reject) => window.fetch(resolveUrl(url), {
     method,
     headers: {
         Authorization: localStorage.getItem("token") as string
