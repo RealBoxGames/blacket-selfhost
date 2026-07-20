@@ -32,6 +32,8 @@ export { default as MapEditor } from "./MapEditor/route";
 export { default as StaffPanel } from "./Staff/route";
 export { default as StaffExperiments } from "./Staff/Experiments/route";
 export { default as StaffModeration } from "./Staff/Moderation/route";
+export { default as StaffBlooks } from "./Staff/Blooks/route";
+export { default as StaffPacks } from "./Staff/Packs/route";
 export { default as Test } from "./Test/route";
 
 // INTERNAL ROUTES

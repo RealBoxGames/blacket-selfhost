@@ -1,34 +1,42 @@
-import { IsNotEmpty, Length, Matches, Validate } from "class-validator";
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min } from "class-validator";
 
 export class StaffAdminCreatePackDto {
     @IsNotEmpty()
-    @Validate((value: string) => value.length > 0)
+    @IsString()
     readonly name: string;
 
     @IsNotEmpty()
+    @IsInt()
+    @Min(0)
     readonly price: number;
 
     @IsNotEmpty()
+    @IsInt()
     readonly imageId: number;
 
     @IsNotEmpty()
+    @IsInt()
     readonly iconId: number;
 
     @IsNotEmpty()
-    @Length(7)
-    @Matches(/^#[0-9a-fA-F]{6}$/)
-    @Validate((value: string) => value.length === 7)
-    readonly innerColor: string;
+    @IsInt()
+    readonly backgroundId: number;
 
-    @IsNotEmpty()
-    @Length(7, 7)
-    @Matches(/^#[0-9a-fA-F]{6}$/)
-    @Validate((value: string) => value.length === 7)
-    readonly outerColor: string;
+    @IsOptional()
+    @IsInt()
+    readonly ambienceId?: number;
 
-    @IsNotEmpty()
-    @Validate((value: boolean) => typeof value === "boolean")
-    readonly enabled: boolean;
+    @IsOptional()
+    @IsBoolean()
+    readonly enabled?: boolean;
+
+    @IsOptional()
+    @IsBoolean()
+    readonly hidden?: boolean;
+
+    @IsOptional()
+    @IsInt()
+    readonly priority?: number;
 }
 
 export default StaffAdminCreatePackDto;

@@ -108,6 +108,18 @@ const STAFF_PAGES: Page[] = [
         link: "/staff",
         permission: PermissionTypeEnum.MANAGE_DATA,
         textSizeOverride: 18
+    },
+    {
+        icon: "fas fa-dragon",
+        text: "Blooks",
+        link: "/staff/blooks",
+        permission: PermissionTypeEnum.MANAGE_DATA
+    },
+    {
+        icon: "fas fa-box-open",
+        text: "Packs",
+        link: "/staff/packs",
+        permission: PermissionTypeEnum.MANAGE_DATA
     }
 ];
 
