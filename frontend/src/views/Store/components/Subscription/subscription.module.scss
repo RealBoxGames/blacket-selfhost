@@ -124,3 +124,25 @@
     font-size: 12px;
     font-style: italic;
 }
+
+.currencyPrice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+    }
+}

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { Tooltip } from "react-tooltip";
 import Textfit from "react-textfit";
-import { Button, MiniNavbar, SidebarBody } from "@components/index";
+import { SidebarBody } from "@components/index";
 import { Category, Product, ProductModal, Subscription } from "./components/index";
 import { useUser } from "@stores/UserStore/index";
 import { useLoading } from "@stores/LoadingStore/index";
@@ -10,8 +10,6 @@ import { useModal } from "@stores/ModalStore/index";
 import { useData } from "@stores/DataStore/index";
 import { useStores } from "@controllers/stripe/useProducts/index";
 import styles from "./store.module.scss";
-
-import { BillingIntervalEnum } from "@blacket/types";
 
 export default function Store() {
     const { user } = useUser();
@@ -52,8 +50,6 @@ export default function Store() {
         }
     };
 
-    const [subscriptionInterval, setSubscriptionInterval] = useState<BillingIntervalEnum>(BillingIntervalEnum.MONTHLY);
-
     return (
         <>
             <SidebarBody pushOnMobile={false}>
@@ -67,50 +63,36 @@ export default function Store() {
 
                     {subscriptions && <Category
                         title="Plans"
-                        subTitle={`The best way to enhance your ${import.meta.env.VITE_INFORMATION_NAME} experience with exclusive perks and benefits!`}
+                        subTitle={`The best way to enhance your ${import.meta.env.VITE_INFORMATION_NAME} experience with exclusive perks and benefits! Purchased outright with tokens, diamonds, and crystals — no real money involved.`}
                         spaceEvenly={true}
-                        rightChildren={<MiniNavbar items={[
-                            {
-                                text: "Monthly",
-                                active: subscriptionInterval === BillingIntervalEnum.MONTHLY,
-                                onClick: () => setSubscriptionInterval(BillingIntervalEnum.MONTHLY)
-                            },
-                            {
-                                text: "Yearly",
-                                active: subscriptionInterval === BillingIntervalEnum.YEARLY,
-                                onClick: () => setSubscriptionInterval(BillingIntervalEnum.YEARLY)
-                            },
-                            {
-                                text: "Lifetime",
-                                active: subscriptionInterval === BillingIntervalEnum.LIFETIME,
-                                onClick: () => setSubscriptionInterval(BillingIntervalEnum.LIFETIME)
-                            }
-                        ]} mobileIconOnly={false} />}
                     >
                         {subscriptions
+                            .filter((subscription) => subscription.tokenPrice && subscription.diamondPrice && subscription.crystalPrice)
                             .sort((a, b) => a.priority - b.priority)
-                            .map((subscription, i) => <Subscription key={i} subscription={subscription} interval={subscriptionInterval} />)}
+                            .map((subscription, i) => <Subscription key={i} subscription={subscription} />)}
                     </Category>}
 
                     {stores && stores
                         .sort((a, b) => a.priority - b.priority)
-                        .map((store, i) => (
-                            <Category key={i} title={store.name} subTitle={store.description}>
-                                {store.products && store.products
-                                    .map((productId, i) => {
-                                        const product = products.find((p) => p.id === productId);
-                                        if (!product) return null;
+                        .map((store, i) => {
+                            const storeProducts = (store.products ?? [])
+                                .map((productId) => products.find((p) => p.id === productId))
+                                .filter((product): product is NonNullable<typeof product> => Boolean(product) && product!.isPriceUsingCrystals);
 
-                                        return (
-                                            <Product
-                                                key={i}
-                                                product={product}
-                                                onClick={() => createModal(<ProductModal product={product} />)}
-                                            />
-                                        );
-                                    })}
-                            </Category>
-                        ))}
+                            if (storeProducts.length === 0) return null;
+
+                            return (
+                                <Category key={i} title={store.name} subTitle={store.description}>
+                                    {storeProducts.map((product, i) => (
+                                        <Product
+                                            key={i}
+                                            product={product}
+                                            onClick={() => createModal(<ProductModal product={product} />)}
+                                        />
+                                    ))}
+                                </Category>
+                            );
+                        })}
                 </div>
             </SidebarBody>
 

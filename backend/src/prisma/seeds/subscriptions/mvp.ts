@@ -20,6 +20,9 @@ export const mvpSubscription: SubscriptionSeed = {
     monthlyPriceId: "price_1SlS0VCFO8GPmE9Y7Debev9G",
     yearlyPriceId: "price_1T43d7CFO8GPmE9YZkpUyFOU",
     lifetimePrice: 99.99,
+    tokenPrice: 150000,
+    diamondPrice: 1500,
+    crystalPrice: 150,
     color1: "#00FFFF",
     color2: "#0066FF",
     group: "MVP"

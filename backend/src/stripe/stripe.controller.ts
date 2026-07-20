@@ -127,6 +127,14 @@ export class StripeController {
     }
 
     // @Throttle({ global: { limit: 3, ttl: minutes(1) } })
+    @Post("purchase-subscription-with-currency/:subscriptionId")
+    async purchaseSubscriptionWithCurrency(@GetCurrentUser() userId: string,
+        @Param("subscriptionId", ParseIntPipe) id: number,
+        @RealIp() ip: string,) {
+        return this.stripeService.purchaseSubscriptionWithCurrency(userId, id, ip);
+    }
+
+    // @Throttle({ global: { limit: 3, ttl: minutes(1) } })
     @Post("purchase-with-crystals/:productId")
     async purchaseWithCrystals(@GetCurrentUser() userId: string,
         @Param("productId", ParseIntPipe) id: number,

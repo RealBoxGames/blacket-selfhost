@@ -23,7 +23,7 @@ export default function DirectMessages() {
     const { cachedUsers, addCachedUser } = useCachedUser();
 
     const { messages } = useChat();
-    const { room, setRoom } = useChatStore();
+    const { room, setRoom, unreadDmUserIds, clearDmUnread } = useChatStore();
 
     const [dms, setDms] = useState<DmEntry[]>([]);
     const [loadingDms, setLoadingDms] = useState<boolean>(true);
@@ -48,6 +48,16 @@ export default function DirectMessages() {
         if (!userId) return;
 
         addCachedUser(userId);
+        clearDmUnread(userId);
+
+        // if we already know this conversation's room (switching between
+        // already-loaded DMs), switch instantly instead of round-tripping
+        // through find-or-create every click
+        const existing = dms.find((d) => d.otherUser?.id === userId);
+        if (existing) {
+            setRoom(existing.roomId);
+            return;
+        }
 
         findOrCreateDm(userId)
             .then((res) => {
@@ -55,7 +65,7 @@ export default function DirectMessages() {
                 refreshDms();
             })
             .catch(() => navigate("/direct-messages"));
-    }, [userId]);
+    }, [userId, dms]);
 
     // resolves a DM participant into a full displayable user, preferring the
     // real username we already have from listDms over whatever's cached
@@ -112,6 +122,8 @@ export default function DirectMessages() {
                                     ? <Username user={displayUser} className={styles.dmUsername} />
                                     : <span className={styles.dmUsername}>{dm.otherUser.username}</span>
                                 }
+
+                                {unreadDmUserIds.includes(dm.otherUser.id) && <div className={styles.dmUnreadDot} />}
                             </div>
                         );
                     })}

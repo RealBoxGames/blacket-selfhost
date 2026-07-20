@@ -80,6 +80,9 @@ export interface SubscriptionSeed {
     monthlyPriceId: string;
     yearlyPriceId: string;
     lifetimePrice: number;
+    tokenPrice?: number;
+    diamondPrice?: number;
+    crystalPrice?: number;
     color1: string;
     color2: string;
     group: string;

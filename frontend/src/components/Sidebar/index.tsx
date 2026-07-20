@@ -2,7 +2,6 @@ import { useState, memo, useMemo, useCallback } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { useUser } from "@stores/UserStore/index";
 import { useChat } from "@stores/ChatStore/index";
-import { Button } from "@components/index";
 import { PageItem, BottomPageItem } from "./components/index";
 import styles from "./sidebar.module.scss";
 
@@ -104,40 +103,9 @@ const PAGES: { left: Page[]; bottom: Page[] } = {
 const STAFF_PAGES: Page[] = [
     {
         icon: "fas fa-shield-halved",
-        text: "Moderation",
-        link: "/staff/moderation",
-        permission: PermissionTypeEnum.MUTE_USERS
-    },
-    {
-        icon: "fas fa-user-gear",
-        text: "User Manager",
+        text: "Panel",
         link: "/staff",
-        permission: PermissionTypeEnum.MANAGE_DATA,
-        textSizeOverride: 18
-    },
-    {
-        icon: "fas fa-dragon",
-        text: "Blooks",
-        link: "/staff/blooks",
-        permission: PermissionTypeEnum.MANAGE_DATA
-    },
-    {
-        icon: "fas fa-box-open",
-        text: "Packs",
-        link: "/staff/packs",
-        permission: PermissionTypeEnum.MANAGE_DATA
-    },
-    {
-        icon: "fas fa-newspaper",
-        text: "News",
-        link: "/staff/news",
-        permission: PermissionTypeEnum.MANAGE_DATA
-    },
-    {
-        icon: "fas fa-bolt",
-        text: "Boosters",
-        link: "/staff/boosters",
-        permission: PermissionTypeEnum.MANAGE_DATA
+        permission: PermissionTypeEnum.MUTE_USERS
     }
 ];
 
@@ -214,15 +182,6 @@ export default memo(function Sidebar() {
                             />
                         ))}
                     </div>
-
-                    <Button.GenericButton
-                        to="/store"
-                        icon="fas fa-cart-shopping"
-                        className={styles.visitStoreButton}
-                        backgroundColor="#2b22c2"
-                    >
-                        Store
-                    </Button.GenericButton>
                 </div>
             </div>
 
@@ -274,16 +233,6 @@ export default memo(function Sidebar() {
                             />
                         ))}
                     </div>
-
-                    <Button.GenericButton
-                        to="/store"
-                        icon="fas fa-cart-shopping"
-                        className={styles.visitStoreButton}
-                        backgroundColor="#2b22c2"
-                        onClick={handleMobileSidebarClose}
-                    >
-                        Store
-                    </Button.GenericButton>
                 </div>
             </div>
         </>

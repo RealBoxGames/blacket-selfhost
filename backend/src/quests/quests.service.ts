@@ -45,33 +45,31 @@ export class QuestsService {
     }
 
     async claimDailyTokens(userId: string): Promise<{ tokens: number }> {
-        return await this.prismaService.$transaction(async (tx) => {
-            const claimableDate = new Date();
-            claimableDate.setUTCHours(0, 0, 0, 0);
+        const claimableDate = new Date();
+        claimableDate.setUTCHours(0, 0, 0, 0);
 
-            const alreadyClaimed = await tx.user.count({
-                where: {
-                    id: userId,
-                    lastClaimed: {
-                        gte: claimableDate
-                    }
-                }
-            });
-            if (alreadyClaimed) throw new ForbiddenException(Forbidden.QUESTS_DAILY_ALREADY_CLAIMED,);
+        const tokensToAdd = this.getRandomDailyTokens();
 
-            const tokensToAdd = this.getRandomDailyTokens();
-
-            await tx.user.update({
-                where: { id: userId },
-                data: {
-                    tokens: {
-                        increment: tokensToAdd
-                    },
-                    lastClaimed: claimableDate
-                }
-            });
-
-            return { tokens: tokensToAdd };
+        // single conditional UPDATE (not read-then-write) so two concurrent
+        // claim requests can't both pass a stale lastClaimed check and both
+        // credit tokens - only the first to commit can match the WHERE
+        const claimed = await this.prismaService.user.updateMany({
+            where: {
+                id: userId,
+                OR: [
+                    { lastClaimed: null },
+                    { lastClaimed: { lt: claimableDate } }
+                ]
+            },
+            data: {
+                tokens: {
+                    increment: tokensToAdd
+                },
+                lastClaimed: claimableDate
+            }
         });
+        if (claimed.count === 0) throw new ForbiddenException(Forbidden.QUESTS_DAILY_ALREADY_CLAIMED,);
+
+        return { tokens: tokensToAdd };
     }
 }

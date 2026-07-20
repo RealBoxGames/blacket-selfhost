@@ -31,4 +31,11 @@ export class MarketController {
         @Body() dto: MarketConvertDiamondsDto,) {
         return await this.marketService.convertDiamonds(userId, dto);
     }
+
+    @Throttle({ global: { limit: 1, ttl: seconds(10) } })
+    @Put("convert-diamonds-to-crystals")
+    async convertDiamondsToCrystals(@GetCurrentUser() userId: string,
+        @Body() dto: MarketConvertDiamondsDto,) {
+        return await this.marketService.convertDiamondsToCrystals(userId, dto);
+    }
 }

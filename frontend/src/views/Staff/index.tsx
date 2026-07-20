@@ -1,90 +1,87 @@
-import { useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useUser } from "@stores/UserStore/index";
-import { useModal } from "@stores/ModalStore/index";
-import { useData } from "@stores/DataStore/index";
-import { useResource } from "@stores/ResourceStore/index";
-import { SearchBox, Button, Blook } from "@components/index";
 import styles from "./staff.module.scss";
 
-import { PermissionTypeEnum, StaffUserEntity } from "@blacket/types";
-
-import { useSearchUsers } from "@controllers/staff/useSearchUsers";
-import StaffEditUserModal from "./components/StaffEditUserModal";
+import { PermissionTypeEnum } from "@blacket/types";
 import { isOwnerTier } from "@functions/staff/isOwnerTier";
+
+interface PanelTile {
+    icon: string;
+    text: string;
+    description: string;
+    link: string;
+    visible: boolean;
+}
 
 export default function StaffPanel() {
     const { user } = useUser();
-    const { createModal } = useModal();
-    const { searchUsers } = useSearchUsers();
-    const { blooks } = useData();
-    const { resourceIdToPath } = useResource();
+    const navigate = useNavigate();
 
-    const [search, setSearch] = useState<string>("");
-    const [results, setResults] = useState<StaffUserEntity[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    if (!user || !user.hasPermission(PermissionTypeEnum.MUTE_USERS)) return <Navigate to="/login" />;
 
-    if (!user || !user.hasPermission(PermissionTypeEnum.MANAGE_DATA)) return <Navigate to="/login" />;
+    const isOwnerOrDev = isOwnerTier(user);
+    const hasManageData = user.hasPermission(PermissionTypeEnum.MANAGE_DATA);
 
-    const isSuperAdmin = isOwnerTier(user);
-
-    const doSearch = () => {
-        setLoading(true);
-
-        searchUsers(search)
-            .then((res) => setResults(res.data))
-            .catch(() => setResults([]))
-            .finally(() => setLoading(false));
-    };
-
-    const getAvatarSrc = (staffUser: StaffUserEntity) => {
-        const blook = blooks.find((b) => b.id === staffUser.avatarBlookId);
-
-        return blook ? resourceIdToPath(blook.imageId) : window.constructCDNUrl("/content/blooks/Default.png");
-    };
-
-    const openEditModal = (staffUser: StaffUserEntity) => {
-        createModal(<StaffEditUserModal
-            staffUser={staffUser}
-            isSuperAdmin={isSuperAdmin}
-            onUpdated={(updated) => setResults((current) => current.map((u) => (u.id === updated.id ? updated : u)))}
-            onDeleted={(userId) => setResults((current) => current.filter((u) => u.id !== userId))}
-        />);
-    };
+    const TILES: PanelTile[] = [
+        {
+            icon: "fas fa-shield-halved",
+            text: "Moderation",
+            description: "Ban, mute, and IP-ban users.",
+            link: "/staff/moderation",
+            visible: user.hasPermission(PermissionTypeEnum.MUTE_USERS)
+        },
+        {
+            icon: "fas fa-user-gear",
+            text: "User Manager",
+            description: "Search users, edit roles, currency, and cosmetics.",
+            link: "/staff/users",
+            visible: hasManageData
+        },
+        {
+            icon: "fas fa-dragon",
+            text: "Blooks",
+            description: "Create and edit blooks.",
+            link: "/staff/blooks",
+            visible: hasManageData
+        },
+        {
+            icon: "fas fa-box-open",
+            text: "Packs",
+            description: "Create and edit packs.",
+            link: "/staff/packs",
+            visible: hasManageData
+        },
+        {
+            icon: "fas fa-newspaper",
+            text: "News",
+            description: "Post news updates.",
+            link: "/staff/news",
+            visible: hasManageData
+        },
+        {
+            icon: "fas fa-bolt",
+            text: "Boosters",
+            description: "Activate and manage global boosters.",
+            link: "/staff/boosters",
+            visible: hasManageData
+        }
+    ];
 
     return (
-        <div className={styles.panelContainer}>
-            <div className={styles.userManager}>
-                <SearchBox
-                    placeholder="Search for a user..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter") doSearch(); }}
-                    buttons={[{ icon: "fas fa-search", tooltip: "Search", onClick: doSearch }]}
-                />
+        <div className={styles.panel}>
+            {isOwnerOrDev && <div className={styles.panelBadge}>Owner / Developer Access</div>}
 
-                {loading && <div className={styles.status}>Loading...</div>}
-                {!loading && results.length === 0 && <div className={styles.status}>No users loaded. Search above to get started.</div>}
+            <div className={styles.panelGrid}>
+                {TILES.filter((tile) => tile.visible).map((tile) => (
+                    <div key={tile.link} className={styles.panelTile} onClick={() => navigate(tile.link)}>
+                        <i className={tile.icon} />
 
-                <div className={styles.userList}>
-                    {results.map((staffUser) => (
-                        <div key={staffUser.id} className={styles.userRow}>
-                            <Blook src={getAvatarSrc(staffUser)} shiny={staffUser.avatarShiny} className={styles.userAvatar} />
-
-                            <div className={styles.userInfo}>
-                                <div className={styles.username}>{staffUser.username}</div>
-                                <div className={styles.userStats}>
-                                    {staffUser.tokens.toLocaleString()} tokens • {staffUser.diamonds.toLocaleString()} diamonds • {staffUser.crystals.toLocaleString()} crystals
-                                </div>
-                                <div className={styles.userGroups}>
-                                    {staffUser.groups.length > 0 ? staffUser.groups.map((g) => g.name).join(", ") : "No roles"}
-                                </div>
-                            </div>
-
-                            <Button.GenericButton onClick={() => openEditModal(staffUser)}>Edit</Button.GenericButton>
+                        <div className={styles.panelTileText}>
+                            <div className={styles.panelTileTitle}>{tile.text}</div>
+                            <div className={styles.panelTileDescription}>{tile.description}</div>
                         </div>
-                    ))}
-                </div>
+                    </div>
+                ))}
             </div>
         </div>
     );

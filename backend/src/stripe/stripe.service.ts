@@ -1306,6 +1306,104 @@ export class StripeService {
         return paymentIntent;
     }
 
+    // buys a plan outright (lifetime) using in-game currency instead of real money.
+    // debits tokens/diamonds/crystals with a single conditional UPDATE (WHERE balance >= price)
+    // rather than read-then-write, so two concurrent requests can't both pass a stale balance
+    // check and double-spend.
+    async purchaseSubscriptionWithCurrency(userId: string, subscriptionId: number, ipAddress: string) {
+        const plan = await this.prismaService.subscription.findUnique({ where: { id: subscriptionId } });
+        if (!plan) throw new NotFoundException(NotFound.UNKNOWN_SUBSCRIPTION);
+        if (!plan.tokenPrice || !plan.diamondPrice || !plan.crystalPrice) throw new ForbiddenException(Forbidden.STRIPE_SUBSCRIPTION_NOT_PURCHASABLE_WITH_CURRENCY);
+
+        const existingSubscription = await this.prismaService.userSubscription.findFirst({
+            where: {
+                userId,
+                status: {
+                    in: [
+                        UserSubscriptionStatus.ACTIVE,
+                        UserSubscriptionStatus.PENDING_CANCELLATION
+                    ]
+                },
+                OR: [
+                    { expiresAt: null },
+                    { expiresAt: { gt: new Date() } }
+                ]
+            },
+            orderBy: [
+                { status: "asc" },
+                { createdAt: "desc" }
+            ],
+            include: { subscription: true }
+        });
+        if (existingSubscription && existingSubscription.subscriptionId === plan.id && !existingSubscription.expiresAt) {
+            throw new ConflictException(Conflict.STRIPE_SUBSCRIPTION_ALREADY_EXISTS);
+        }
+
+        const ip = await this.prismaService.ipAddress.upsert({
+            where: { ipAddress },
+            create: { ipAddress },
+            update: {}
+        });
+
+        const userSubscription = await this.prismaService.$transaction(async (tx) => {
+            const debited = await tx.user.updateMany({
+                where: {
+                    id: userId,
+                    tokens: { gte: plan.tokenPrice },
+                    diamonds: { gte: plan.diamondPrice },
+                    crystals: { gte: plan.crystalPrice }
+                },
+                data: {
+                    tokens: { decrement: plan.tokenPrice },
+                    diamonds: { decrement: plan.diamondPrice },
+                    crystals: { decrement: plan.crystalPrice }
+                }
+            });
+            if (debited.count === 0) throw new ForbiddenException(Forbidden.STRIPE_NOT_ENOUGH_CURRENCY);
+
+            const created = await tx.userSubscription.create({
+                data: {
+                    userId,
+                    subscriptionId: plan.id,
+                    billingInterval: BillingInterval.LIFETIME,
+                    status: UserSubscriptionStatus.ACTIVE,
+                    ipAddressId: ip.id,
+                    expiresAt: null
+                }
+            });
+
+            await this.connectSubscriptionGroup(userId, plan, tx);
+
+            if (existingSubscription && existingSubscription.id !== created.id) {
+                const previous = await tx.userSubscription.update({
+                    where: { id: existingSubscription.id },
+                    data: {
+                        status: UserSubscriptionStatus.CANCELED,
+                        expiresAt: new Date()
+                    },
+                    include: {
+                        subscription: {
+                            select: { groupId: true }
+                        }
+                    }
+                });
+
+                await this.disconnectSubscriptionGroupIfUnused(userId, previous.subscription.groupId, previous.id, tx,);
+            }
+
+            return created;
+        });
+
+        if (existingSubscription?.stripeSubscriptionId) {
+            await this.stripe.subscriptions.cancel(existingSubscription.stripeSubscriptionId).catch((err) => console.error("Error canceling previous subscription:", err));
+        }
+
+        this.permissionsService.clearCache(userId);
+        this.socketService.emitUserRefetchMeEvent(userId);
+
+        return { subscription: userSubscription };
+    }
+
     async purchaseWithCrystals(userId: string,
         productId: number,
         quantity: number,

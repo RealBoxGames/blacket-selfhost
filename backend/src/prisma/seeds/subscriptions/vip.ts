@@ -16,6 +16,9 @@ export const vipSubscription: SubscriptionSeed = {
     monthlyPriceId: "price_1SlS0CCFO8GPmE9YP7djk9s9",
     yearlyPriceId: "price_1T43aSCFO8GPmE9Yg8hsXMqh",
     lifetimePrice: 29.99,
+    tokenPrice: 50000,
+    diamondPrice: 500,
+    crystalPrice: 50,
     color1: "#FFD000",
     color2: "#FFD000",
     group: "VIP"

@@ -33,5 +33,7 @@ export enum Forbidden {
     FRIENDS_CANNOT_BLOCK_SELF = "You cannot block yourself.",
     FRIENDS_FRIEND_REQUESTS_OFF = "This user is not accepting friend requests.",
     STRIPE_NOT_ENOUGH_CRYSTALS = "You do not have enough crystals to purchase this item.",
+    STRIPE_NOT_ENOUGH_CURRENCY = "You do not have enough tokens, diamonds, and crystals to purchase this plan.",
+    STRIPE_SUBSCRIPTION_NOT_PURCHASABLE_WITH_CURRENCY = "This plan cannot be purchased with tokens, diamonds, and crystals.",
     STAFF_ONLY_OWNER = "Only the owner can perform this action."
 };

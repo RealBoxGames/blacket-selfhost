@@ -7,6 +7,10 @@ import { ChatService } from "src/chat/chat.service";
 import { DataKey, DataService } from "src/data/data.service";
 import { Blook, BlookObtainMethod, Boost, BoostType, ItemObtainMethod } from "@blacket/core";
 
+// crystals can no longer be bought with real money, so this rate is kept
+// steep to keep crystals meaningfully rare rather than trivially farmable
+const DIAMONDS_PER_CRYSTAL = 100;
+
 @Injectable()
 export class MarketService {
     constructor(private readonly prismaService: PrismaService,
@@ -38,12 +42,25 @@ export class MarketService {
                 });
             if (!blooks) throw new NotFoundException(NotFound.UNKNOWN_PACK);
 
-            // increment user's pack opened amount, and experience. insert blook to table. decrement user tokens
-            await tx.user.update({ select: null, where: { id: userId }, data: { tokens: { decrement: pack.price } } });
-            await tx.userStatistic.update({ select: null, where: { id: userId }, data: { packsOpened: { increment: 1 } } });
-
             const blookId = blooks[0].blookId;
             const shiny = blooks[0].shiny > 0;
+
+            const pulledBlook = packBlooks.find((blook) => blook.id === blookId);
+            const pulledRarity = rarities.find((rarity) => rarity.id === pulledBlook?.rarityId);
+            const experienceToAdd = pulledRarity?.experience ?? 0;
+
+            // single conditional UPDATE (not read-then-write) so two concurrent
+            // opens can't both pass the earlier balance check and double-spend
+            const debited = await tx.user.updateMany({
+                where: { id: userId, tokens: { gte: pack.price } },
+                data: {
+                    tokens: { decrement: pack.price },
+                    experience: { increment: experienceToAdd }
+                }
+            });
+            if (debited.count === 0) throw new ForbiddenException(Forbidden.PACKS_NOT_ENOUGH_TOKENS);
+
+            await tx.userStatistic.update({ select: null, where: { id: userId }, data: { packsOpened: { increment: 1 } } });
 
             // const currentCount = await tx.userBlook.count({ where: { blookId, shiny } });
             // TODO: figure out a way to make this faster
@@ -51,13 +68,12 @@ export class MarketService {
                 .then((res) => res?.serial ?? 0);
             const nextSerial = currentCount + 1;
 
-            const blook = packBlooks.find((blook) => blook.id === blookId);
-            if (blook?.video) {
-                this.spamChatOnInsanePull(userId, blook);
+            if (pulledBlook?.video) {
+                this.spamChatOnInsanePull(userId, pulledBlook);
 
                 this.socketService.emitInsanePullEvent({
                     userId,
-                    videoId: blook.video.resourceId
+                    videoId: pulledBlook.video.resourceId
                 });
             }
 
@@ -71,20 +87,16 @@ export class MarketService {
         if (!itemShopPurchase || !itemShopPurchase.enabled) throw new NotFoundException(NotFound.DEFAULT);
 
         return await this.prismaService.$transaction(async (tx) => {
-            const user = await tx.user.findUnique({select: {tokens: true}, where: {id: userId}}); // presumably gets user
-            if (!user) throw new NotFoundException(NotFound.UNKNOWN_USER);
-            if (user.tokens < itemShopPurchase.price) throw new ForbiddenException(Forbidden.PACKS_NOT_ENOUGH_TOKENS); // ur broke
-
             if (!itemShopPurchase.blookId && !itemShopPurchase.itemId) throw new ForbiddenException(Forbidden.DEFAULT);
             if (itemShopPurchase.blookId && itemShopPurchase.itemId) throw new ForbiddenException(Forbidden.DEFAULT); // this is so that they dont overlap.
 
-            // removes le User Coins...
-
-            await tx.user.update({
-                select: null,
-                where: {id: userId},
+            // single conditional UPDATE (not read-then-write) so two concurrent
+            // purchases can't both pass a stale balance check and double-spend
+            const debited = await tx.user.updateMany({
+                where: {id: userId, tokens: {gte: itemShopPurchase.price}},
                 data: {tokens: {decrement: itemShopPurchase.price}}
             });
+            if (debited.count === 0) throw new ForbiddenException(Forbidden.PACKS_NOT_ENOUGH_TOKENS); // ur broke
 
             if (itemShopPurchase.blookId) {
                 const blookId = itemShopPurchase.blookId;
@@ -128,23 +140,33 @@ export class MarketService {
     }
 
     async convertDiamonds(userId: string, dto: MarketConvertDiamondsDto) {
-        return await this.prismaService.$transaction(async (tx) => {
-            const user = await tx.user.findUnique({
-                where: { id: userId },
-                select: { diamonds: true }
-            });
-            if (!user) throw new NotFoundException(NotFound.UNKNOWN_USER);
-
-            if (user.diamonds < dto.amount) throw new ForbiddenException(Forbidden.DEFAULT_NOT_ENOUGH_DIAMONDS,);
-
-            await tx.user.update({
-                where: { id: userId },
-                data: {
-                    diamonds: { decrement: dto.amount },
-                    tokens: { increment: dto.amount * 3 }
-                }
-            });
+        // atomic conditional UPDATE, not read-then-write - immune to two
+        // concurrent requests both passing a stale balance check
+        const converted = await this.prismaService.user.updateMany({
+            where: { id: userId, diamonds: { gte: dto.amount } },
+            data: {
+                diamonds: { decrement: dto.amount },
+                tokens: { increment: dto.amount * 3 }
+            }
         });
+        if (converted.count === 0) throw new ForbiddenException(Forbidden.DEFAULT_NOT_ENOUGH_DIAMONDS);
+    }
+
+    async convertDiamondsToCrystals(userId: string, dto: MarketConvertDiamondsDto) {
+        if (dto.amount % DIAMONDS_PER_CRYSTAL !== 0) throw new ForbiddenException(Forbidden.DEFAULT_NOT_ENOUGH_DIAMONDS);
+
+        const crystalsToAdd = dto.amount / DIAMONDS_PER_CRYSTAL;
+
+        const converted = await this.prismaService.user.updateMany({
+            where: { id: userId, diamonds: { gte: dto.amount } },
+            data: {
+                diamonds: { decrement: dto.amount },
+                crystals: { increment: crystalsToAdd }
+            }
+        });
+        if (converted.count === 0) throw new ForbiddenException(Forbidden.DEFAULT_NOT_ENOUGH_DIAMONDS);
+
+        return { crystals: crystalsToAdd };
     }
 
     private async getActiveBoosters(userId: string) {

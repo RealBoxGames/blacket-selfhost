@@ -6,7 +6,7 @@ import { useModal } from "@stores/ModalStore/index";
 import { useLoading } from "@stores/LoadingStore/index";
 import { useDiscordLink } from "@controllers/discord/useDiscordLink/index";
 import { useSettings } from "@controllers/settings/useSettings/index";
-import { Button, Modal, PaymentMethodText } from "@components/index";
+import { Button, Modal } from "@components/index";
 import { SettingsContainer, Divider } from "..";
 import { PlanText, UpgradeButton, ChangeUsernameModal } from "./components/index";
 
@@ -14,7 +14,7 @@ import { SettingFriendRequestEnum } from "@blacket/types";
 
 export default function Account() {
     const { user } = useUser();
-    const { fontIdToName } = useData();
+    const { fontIdToName, subscriptions } = useData();
     const { createModal } = useModal();
     const { setLoading } = useLoading();
 
@@ -24,6 +24,13 @@ export default function Account() {
     const navigate = useNavigate();
 
     if (!user) return null;
+
+    const currentSubscription = subscriptions.find((sub) =>
+        user.subscriptions.some((userSub) =>
+            userSub.subscriptionId === sub.id &&
+            (!userSub.expiresAt || new Date(userSub.expiresAt) > new Date())
+        )
+    );
 
     const friendRequestsButton = () => {
         setLoading("Changing settings");
@@ -91,20 +98,15 @@ export default function Account() {
             </Button.ClearButton>
         </SettingsContainer>
 
-        <SettingsContainer header={{ icon: "fas fa-wallet", text: "Billing" }}>
-            <PlanText>Basic</PlanText>
+        <SettingsContainer header={{ icon: "fas fa-wallet", text: "Plan" }}>
+            <PlanText>{currentSubscription ? currentSubscription.name : "Basic"}</PlanText>
 
-            <UpgradeButton>Upgrade</UpgradeButton>
+            <UpgradeButton>{currentSubscription ? "Switch Plans" : "Upgrade"}</UpgradeButton>
 
             <Divider margin={15} />
 
-            <div>
-                <b>Payment Method:</b> {user.paymentMethods.length > 0 ? <>
-                    <PaymentMethodText paymentMethod={user.paymentMethods.find((method) => method.primary)} />
-                </> : "None"}
-            </div>
             <div style={{ marginTop: 5 }}>
-                <Button.ClearButton onClick={() => navigate("/settings/billing")}>Manage Payment Methods</Button.ClearButton>
+                <Button.ClearButton onClick={() => navigate("/settings/billing")}>View Transaction History</Button.ClearButton>
             </div>
         </SettingsContainer>
 

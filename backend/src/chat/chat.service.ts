@@ -166,6 +166,11 @@ export class ChatService {
                 data: { messagesSent: { increment: 1 } }
             });
 
+            await tx.user.update({
+                where: { id: userId },
+                data: { experience: { increment: 20 } }
+            });
+
             this.socketService.emitToAll(SocketMessageType.CHAT_MESSAGES_CREATE, { ...message, nonce: dto.nonce },);
 
             return message;

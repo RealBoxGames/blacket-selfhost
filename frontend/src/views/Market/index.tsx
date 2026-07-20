@@ -261,7 +261,7 @@ export default function Market() {
         },
         {
             children: <>Convert Diamonds</>,
-            onClick: () => { }
+            onClick: () => createModal(<Modal.ConvertDiamondsModal />)
         }
     ];
 

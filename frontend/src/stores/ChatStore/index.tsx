@@ -21,6 +21,10 @@ export const useChatStore = create<ChatStore>((set) => ({
 
     setRoom: (room) => set({ room }),
 
+    unreadDmUserIds: [],
+    markDmUnread: (userId) => set((s) => s.unreadDmUserIds.includes(userId) ? s : { unreadDmUserIds: [...s.unreadDmUserIds, userId] }),
+    clearDmUnread: (userId) => set((s) => s.unreadDmUserIds.includes(userId) ? { unreadDmUserIds: s.unreadDmUserIds.filter((id) => id !== userId) } : s),
+
     setReplyingTo: (message) => set({ replyingTo: message }),
     setEditing: (message) => set({ editing: message }),
 

@@ -77,6 +77,15 @@
     white-space: nowrap;
 }
 
+.dmUnreadDot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #F54242;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
 .dmChat {
     flex-grow: 1;
     display: flex;

@@ -9,6 +9,10 @@ export class StripeSubscriptionEntity {
     yearlyPrice?: number
     lifetimePrice?: number;
 
+    tokenPrice?: number;
+    diamondPrice?: number;
+    crystalPrice?: number;
+
     imageId: number;
 
     color1: string;

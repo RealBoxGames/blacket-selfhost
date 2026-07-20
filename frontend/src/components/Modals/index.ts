@@ -1,3 +1,4 @@
+import ConvertDiamondsModal from "./ConvertDiamondsModal";
 import ErrorModal from "./ErrorModal";
 import GenericModal from "./GenericModal";
 import LogoutModal from "./LogoutModal";
@@ -10,6 +11,7 @@ import PurchaseProductModal from "./PurchaseProductModal";
 import WelcomeModal from "./WelcomeModal";
 
 export {
+    ConvertDiamondsModal,
     ErrorModal,
     GenericModal,
     LogoutModal,

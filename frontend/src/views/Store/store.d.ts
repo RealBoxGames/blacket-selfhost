@@ -1,5 +1,5 @@
 import { HTMLAttributes, ReactNode } from "react";
-import { BillingIntervalEnum, StripeProductEntity, StripeSubscriptionEntity } from "@blacket/types";
+import { StripeProductEntity, StripeSubscriptionEntity } from "@blacket/types";
 
 export interface CategoryProps {
     title: string;
@@ -27,5 +27,4 @@ export interface ProductModalProps {
 
 export interface SubscriptionProps {
     subscription: StripeSubscriptionEntity;
-    interval?: BillingIntervalEnum;
 }

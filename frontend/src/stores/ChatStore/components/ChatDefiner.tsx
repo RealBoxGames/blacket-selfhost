@@ -90,8 +90,10 @@ export default function ChatDefiner() {
         const cachedUser = await addCachedUser(message.authorId);
         if (!cachedUser) return;
 
-        // already viewing this exact DM, no need to toast
+        // already viewing this exact DM, no need to toast or mark unread
         if (locationRef.current.pathname === `/direct-messages/${message.authorId}`) return;
+
+        useChatStore.getState().markDmUnread(message.authorId);
 
         createToast({
             header: cachedUser.username,
@@ -204,6 +206,10 @@ export default function ChatDefiner() {
 
     useEffect(() => {
         if (!connected || !user || !socket) return;
+
+        // clear immediately so switching conversations doesn't briefly show
+        // the previous room's messages before the new ones load
+        useChatStore.setState({ messages: [] });
 
         fetchMessages(room);
 

@@ -28,4 +28,7 @@ export interface ChatStore {
     room: number;
     setRoom: (room: number) => void;
     _typingTimeout: number | null;
+    unreadDmUserIds: string[];
+    markDmUnread: (userId: string) => void;
+    clearDmUnread: (userId: string) => void;
 }
