@@ -184,7 +184,10 @@ export class ChatService {
                 data: { experience: { increment: 20 } }
             });
 
-            this.socketService.emitToAll(SocketMessageType.CHAT_MESSAGES_CREATE, { ...message, nonce: dto.nonce },);
+            // room.public was already checked above - private (DM) messages must
+            // only reach that room's participants, never every connected client
+            if (room.public) this.socketService.emitToAll(SocketMessageType.CHAT_MESSAGES_CREATE, { ...message, nonce: dto.nonce },);
+            else this.socketService.emitToChatRoom(room, SocketMessageType.CHAT_MESSAGES_CREATE, { ...message, nonce: dto.nonce },);
 
             return message;
         });
@@ -224,10 +227,8 @@ export class ChatService {
 
         if (!room.public && !room.users.find((user) => user.id === userId)) throw new ForbiddenException(Forbidden.CHAT_ROOM_NO_PERMISSION);
 
-        this.socketService.emitToAll(SocketMessageType.CHAT_TYPING_STARTED, {
-            userId,
-            roomId
-        });
+        if (room.public) this.socketService.emitToAll(SocketMessageType.CHAT_TYPING_STARTED, { userId, roomId },);
+        else this.socketService.emitToChatRoom(room, SocketMessageType.CHAT_TYPING_STARTED, { userId, roomId },);
     }
 
     async deleteMessage(userId: string,
