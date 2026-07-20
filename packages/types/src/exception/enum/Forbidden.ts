@@ -32,5 +32,6 @@ export enum Forbidden {
     FRIENDS_CANNOT_FRIEND_SELF = "You cannot send a friend request to yourself.",
     FRIENDS_CANNOT_BLOCK_SELF = "You cannot block yourself.",
     FRIENDS_FRIEND_REQUESTS_OFF = "This user is not accepting friend requests.",
-    STRIPE_NOT_ENOUGH_CRYSTALS = "You do not have enough crystals to purchase this item."
+    STRIPE_NOT_ENOUGH_CRYSTALS = "You do not have enough crystals to purchase this item.",
+    STAFF_ONLY_OWNER = "Only the owner can perform this action."
 };

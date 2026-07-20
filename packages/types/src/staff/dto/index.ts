@@ -17,3 +17,4 @@ export * from "./updatePack.dto";
 export * from "./updatePackPriorities.dto";
 export * from "./updateRarity.dto";
 export * from "./updateResource.dto";
+export * from "./user";

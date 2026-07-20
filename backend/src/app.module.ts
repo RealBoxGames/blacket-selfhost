@@ -33,6 +33,7 @@ import { NewsModule } from "./news/news.module";
 import { FriendsModule } from "./friends/friends.module";
 import { RewardsModule } from "./rewards/rewards.module";
 import { InventoryModule } from "./inventory/inventory.module";
+import { StaffModule } from "./staff/staff.module";
 
 import { AuthGuard, UserThrottlerGuard, PermissionGuard } from "./core/guard";
 
@@ -93,7 +94,8 @@ import { AuthGuard, UserThrottlerGuard, PermissionGuard } from "./core/guard";
         NewsModule,
         FriendsModule,
         InventoryModule,
-        RewardsModule
+        RewardsModule,
+        StaffModule
     ],
     controllers: [],
     providers: [

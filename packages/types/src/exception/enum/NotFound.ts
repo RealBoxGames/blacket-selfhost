@@ -21,5 +21,6 @@ export enum NotFound {
     UNKNOWN_TRANSACTION = "That transaction does not exist.",
     UNKNOWN_INVOICE = "That invoice does not exist.",
     UNKNOWN_REWARD = "That reward does not exist.",
-    UNKNOWN_PRICE = "That price does not exist."
+    UNKNOWN_PRICE = "That price does not exist.",
+    UNKNOWN_GROUP = "That group does not exist."
 };

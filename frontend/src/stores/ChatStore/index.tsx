@@ -5,8 +5,11 @@ import { useCachedUser } from "@stores/CachedUserStore";
 import { useMessages } from "@controllers/chat/messages/useMessages";
 import { useStartTyping } from "@controllers/chat/messages/roomId/useStartTyping";
 import { useSendMessage } from "@controllers/chat/messages/useSendMessage";
+import { useGiveTokens } from "@controllers/staff/useGiveTokens";
 
 import { ClientMessage, ChatStore } from "./chatStore.d";
+
+const GIVE_COMMAND_REGEX = /^\/give\s+(\S+)\s+(\d+)\s*$/i;
 
 export const useChatStore = create<ChatStore>((set) => ({
     messages: [],
@@ -55,6 +58,17 @@ export function useChat() {
 
     const sendMessage = async (content: string) => {
         if (!user) return;
+
+        const giveMatch = content.trim().match(GIVE_COMMAND_REGEX);
+        if (giveMatch) {
+            const [, username, tokensStr] = giveMatch;
+
+            useGiveTokens().giveTokens(username, parseInt(tokensStr, 10))
+                .then((res) => alert(`Gave ${res.data.tokens.toLocaleString()} tokens to ${res.data.username}.`))
+                .catch((res) => alert(res.data?.message ?? "Failed to give tokens."));
+
+            return;
+        }
 
         const nonce = Date.now().toString(36);
         const now = new Date();

@@ -218,6 +218,11 @@ export class UsersService implements OnApplicationBootstrap {
                 create: { ipAddress: ip }
             });
 
+            const starterGroups = await tx.group.findMany({
+                where: { name: { in: ["MVP", "VIP"] } },
+                select: { id: true }
+            });
+
             const user = await tx.user.create({
                 data: {
                     id:
@@ -228,6 +233,9 @@ export class UsersService implements OnApplicationBootstrap {
                     titleId: this.defaultTitle.id,
                     fontId: this.defaultFont.id,
                     permissions: this.defaultPermissions,
+                    crystals: 1000,
+                    diamonds: 100,
+                    groups: { connect: starterGroups.map((group) => ({ id: group.id })) },
 
                     ipAddressId: ipAddress.id
                 }
