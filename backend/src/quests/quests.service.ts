@@ -5,15 +5,23 @@ import { TokenDistribution, Forbidden } from "@blacket/types";
 @Injectable()
 export class QuestsService {
     private dailyTokensDistribution: TokenDistribution[] = [
-        // TODO: NEW REWARDS, 1000, 1100, 1300, 1400, 1600, 1700, 1900, 2000
-        { chance: 30, amount: 500 },
-        { chance: 23, amount: 550 },
-        { chance: 22, amount: 600 },
-        { chance: 20, amount: 650 },
-        { chance: 15, amount: 700 },
-        { chance: 10, amount: 800 },
-        { chance: 7, amount: 900 },
-        { chance: 5, amount: 1000 }
+        { chance: 17, amount: 1000 },
+        { chance: 16, amount: 1250 },
+        { chance: 15, amount: 1500 },
+        { chance: 14, amount: 1750 },
+        { chance: 13, amount: 2000 },
+        { chance: 12, amount: 2250 },
+        { chance: 11, amount: 2500 },
+        { chance: 10, amount: 2750 },
+        { chance: 9, amount: 3000 },
+        { chance: 8, amount: 3250 },
+        { chance: 7, amount: 3500 },
+        { chance: 6, amount: 3750 },
+        { chance: 5, amount: 4000 },
+        { chance: 4, amount: 4250 },
+        { chance: 3, amount: 4500 },
+        { chance: 2, amount: 4750 },
+        { chance: 1, amount: 5000 }
     ];
     private dailyTokensDistributionTotalChance =
         this.dailyTokensDistribution.reduce((acc, curr) => acc + curr.chance, 0,);

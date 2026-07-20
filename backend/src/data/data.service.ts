@@ -132,9 +132,15 @@ export class DataService {
         return Promise.all(subscriptions.map(async (sub) => {
             delete sub.stripeProductId;
 
-            const monthlyPrice = sub.monthlyPriceId ? await this.stripeService.getPrice(sub.monthlyPriceId) : null;
+            let monthlyPrice = null;
+            let yearlyPrice = null;
 
-            const yearlyPrice = sub.yearlyPriceId ? await this.stripeService.getPrice(sub.yearlyPriceId) : null;
+            try {
+                monthlyPrice = sub.monthlyPriceId ? await this.stripeService.getPrice(sub.monthlyPriceId) : null;
+                yearlyPrice = sub.yearlyPriceId ? await this.stripeService.getPrice(sub.yearlyPriceId) : null;
+            } catch {
+                // Stripe isn't configured/reachable - fall back to no pricing rather than failing the whole request
+            }
 
             delete sub.monthlyPriceId;
             delete sub.yearlyPriceId;

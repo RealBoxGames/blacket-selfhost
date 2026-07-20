@@ -15,6 +15,7 @@ import { useRevokeRequest } from "@controllers/friends/useRevokeRequest/index";
 import { useDeclineRequest } from "@controllers/friends/useDeclineRequest/index";
 import { useBlockFriend } from "@controllers/friends/useBlockFriend/index";
 import { useUnblockFriend } from "@controllers/friends/useUnblockFriend/index";
+import { useClaimDaily } from "@controllers/quests/useClaimDaily/index";
 import { Auction, Blook, ImageOrVideo, Username, ItemContainer, Title, Button, Modal } from "@components/index";
 import { LevelContainer, LookupUserModal, SectionHeader, StatContainer, CosmeticsModal, StatButton, FriendsContainer, MobileFriendsModal } from "./components";
 import styles from "./dashboard.module.scss";
@@ -42,6 +43,7 @@ export default function Dashboard() {
     const { declineRequest } = useDeclineRequest();
     const { blockFriend } = useBlockFriend();
     const { unblockFriend } = useUnblockFriend();
+    const { claimDaily } = useClaimDaily();
 
     const [searchParams] = useSearchParams();
 
@@ -185,8 +187,11 @@ export default function Dashboard() {
                             Friends
                         </StatButton>}
 
-                        {/* TODO: add daily rewards functoinality */}
-                        {viewingUser.id === user.id && new Date(user.lastClaimed) < claimableDate && <StatButton icon="fas fa-star">Daily Rewards</StatButton>}
+                        {viewingUser.id === user.id && new Date(user.lastClaimed) < claimableDate && <StatButton icon="fas fa-star" onClick={() => {
+                            claimDaily()
+                                .then((res) => alert(`You claimed ${res.data.tokens.toLocaleString()} tokens!`))
+                                .catch((res) => alert(res.data?.message ?? "Failed to claim daily reward."));
+                        }}>Daily Rewards</StatButton>}
 
                         <StatButton icon="fas fa-cart-shopping" onClick={() => {
                             navigate("/store");
