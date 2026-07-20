@@ -10,6 +10,7 @@ export function useRegister() {
     const register = (dto: RegisterDto) => new Promise((resolve, reject) => window.fetch2.post("/api/auth/register", dto)
         .then((res: Fetch2Response & { data: AuthAuthEntity }) => {
             localStorage.setItem("token", res.data.token);
+            localStorage.setItem("showWelcome", "1");
 
             window.fetch2.get("/api/users/me").then((res: Fetch2Response) => {
                 resolve(res);

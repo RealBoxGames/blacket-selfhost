@@ -120,6 +120,13 @@ export default function Dashboard() {
         setViewingUser(user);
     }, [user]);
 
+    useEffect(() => {
+        if (!localStorage.getItem("showWelcome")) return;
+
+        localStorage.removeItem("showWelcome");
+        createModal(<Modal.WelcomeModal />);
+    }, []);
+
     const claimableDate = new Date();
     claimableDate.setUTCHours(0, 0, 0, 0);
 

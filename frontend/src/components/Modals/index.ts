@@ -7,6 +7,7 @@ import ModalDropdownContainer from "./ModalDropdownContainer";
 import ModalHeader from "./ModalHeader";
 import ModalToggleContainer from "./ModalToggleContainer";
 import PurchaseProductModal from "./PurchaseProductModal";
+import WelcomeModal from "./WelcomeModal";
 
 export {
     ErrorModal,
@@ -17,5 +18,6 @@ export {
     ModalDropdownContainer,
     ModalHeader,
     ModalToggleContainer,
-    PurchaseProductModal
+    PurchaseProductModal,
+    WelcomeModal
 };
