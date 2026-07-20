@@ -5,11 +5,11 @@ import { useCachedUser } from "@stores/CachedUserStore";
 import { useMessages } from "@controllers/chat/messages/useMessages";
 import { useStartTyping } from "@controllers/chat/messages/roomId/useStartTyping";
 import { useSendMessage } from "@controllers/chat/messages/useSendMessage";
-import { useGiveTokens } from "@controllers/staff/useGiveTokens";
+import { useExecuteCommand } from "@controllers/chat/useExecuteCommand";
 
 import { ClientMessage, ChatStore } from "./chatStore.d";
 
-const GIVE_COMMAND_REGEX = /^\/give\s+(\S+)\s+(\d+)\s*$/i;
+const COMMAND_REGEX = /^\/(\w+)(?:\s+([\s\S]*))?$/;
 
 export const useChatStore = create<ChatStore>((set) => ({
     messages: [],
@@ -59,13 +59,12 @@ export function useChat() {
     const sendMessage = async (content: string) => {
         if (!user) return;
 
-        const giveMatch = content.trim().match(GIVE_COMMAND_REGEX);
-        if (giveMatch) {
-            const [, username, tokensStr] = giveMatch;
+        const commandMatch = content.trim().match(COMMAND_REGEX);
+        if (commandMatch) {
+            const [, commandName, args] = commandMatch;
 
-            useGiveTokens().giveTokens(username, parseInt(tokensStr, 10))
-                .then((res) => alert(`Gave ${res.data.tokens.toLocaleString()} tokens to ${res.data.username}.`))
-                .catch((res) => alert(res.data?.message ?? "Failed to give tokens."));
+            useExecuteCommand().executeCommand(chatStore.room, commandName, args ?? "")
+                .catch((res) => alert(res.data?.message ?? `Failed to run /${commandName}.`));
 
             return;
         }

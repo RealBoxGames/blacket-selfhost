@@ -11,15 +11,31 @@ import {
     Put
 } from "@nestjs/common";
 import { ChatService } from "./chat.service";
+import { CommandsService } from "./commands/commands.service";
 import { ApiTags } from "@nestjs/swagger";
 import { GetCurrentUser } from "src/core/decorator";
-import { ChatCreateMessageDto, ChatEditMessageDto } from "@blacket/types";
+import { ChatCreateMessageDto, ChatEditMessageDto, ChatExecuteCommandDto } from "@blacket/types";
 import { seconds, Throttle } from "@nestjs/throttler";
 
 @ApiTags("chat")
 @Controller("chat")
 export class ChatController {
-    constructor(private chatService: ChatService) {}
+    constructor(private chatService: ChatService,
+        private commandsService: CommandsService,) {}
+
+    @Get("commands")
+    async listCommands(@GetCurrentUser() userId: string) {
+        return await this.commandsService.listCommandsForUser(userId);
+    }
+
+    @Throttle({ global: { limit: 1, ttl: seconds(1) } })
+    @Post("messages/:roomId/commands/:command")
+    async executeCommand(@GetCurrentUser() userId: string,
+        @Param("roomId", ParseIntPipe) roomId: number,
+        @Param("command") command: string,
+        @Body() dto: ChatExecuteCommandDto,) {
+        return await this.commandsService.executeCommand(userId, roomId, command, dto.args ?? "");
+    }
 
     @Throttle({ global: { limit: 1, ttl: seconds(1) } })
     @Get("messages/:roomId")

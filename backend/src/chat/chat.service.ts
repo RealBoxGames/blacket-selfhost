@@ -117,6 +117,34 @@ export class ChatService {
         });
     }
 
+    async createBotMessage(botUserId: string, roomId: number, content: string): Promise<Message> {
+        const room = await this.redisService.getRoom(roomId);
+        if (!room) throw new NotFoundException(NotFound.UNKNOWN_ROOM);
+
+        const message = await this.prismaService.message.create({
+            data: {
+                author: { connect: { id: botUserId } },
+                room: { connect: { id: roomId } },
+                content,
+                mentions: []
+            },
+            include: {
+                replyingTo: {
+                    select: {
+                        id: true,
+                        content: true,
+                        authorId: true
+                    }
+                }
+            }
+        });
+
+        if (room.public) this.socketService.emitToAll(SocketMessageType.CHAT_MESSAGES_CREATE, message);
+        else this.socketService.emitToChatRoom(room, SocketMessageType.CHAT_MESSAGES_CREATE, message);
+
+        return message;
+    }
+
     async startTyping(userId: string, roomId: number): Promise<void> {
         const room = await this.redisService.getRoom(roomId);
         if (!room) throw new NotFoundException(NotFound.UNKNOWN_ROOM);

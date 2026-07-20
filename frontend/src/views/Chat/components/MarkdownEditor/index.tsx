@@ -5,7 +5,8 @@ import { Slate, Editable, withReact } from "slate-react";
 import { useUser } from "@stores/UserStore/index";
 import { useCachedUser } from "@stores/CachedUserStore/index";
 import { Blook, Username } from "@components/index";
-import { withCustomElement, insertEmoji, insertMention } from "./utils";
+import { withCustomElement, insertEmoji, insertMention, insertCommand } from "./utils";
+import { useListCommands } from "@controllers/chat/useListCommands";
 import decorate from "./decorate";
 import Element from "./elements";
 import Leaf from "./Leaf";
@@ -13,17 +14,31 @@ import styles from "../../chat.module.scss";
 
 import { MarkdownEditorProps } from "../../chat.d";
 
+type ChatCommand = { name: string; description: string; usage: string };
+
 export default function MarkdownEditor({ content, color, readOnly, getEditor = () => { }, ...props }: MarkdownEditorProps) {
     const { getUserAvatarPath } = useUser();
     const { cachedUsers } = useCachedUser();
+    const { listCommands } = useListCommands();
 
     const mentionRef = useRef<HTMLDivElement | null>(null);
     const emojiRef = useRef<HTMLDivElement | null>(null);
+    const slashRef = useRef<HTMLDivElement | null>(null);
 
     const [mentionSearch, setMentionSearch] = useState<string>("");
     const [emojiSearch, setEmojiSearch] = useState<string>("");
+    const [slashSearch, setSlashSearch] = useState<string>("");
     const [mentionTarget, setMentionTarget] = useState<Range | null>(null);
     const [emojiTarget, setEmojiTarget] = useState<Range | null>(null);
+    const [slashTarget, setSlashTarget] = useState<Range | null>(null);
+
+    const [availableCommands, setAvailableCommands] = useState<ChatCommand[]>([]);
+
+    useEffect(() => {
+        if (readOnly) return;
+
+        listCommands().then((res) => setAvailableCommands(res.data)).catch(() => setAvailableCommands([]));
+    }, [readOnly]);
 
     const editor = useMemo(() => withCustomElement(withReact(createEditor())), []);
 
@@ -41,8 +56,13 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
         return window.constants.emojis.filter((e) => e.key.toLowerCase().startsWith(emojiSearch.toLowerCase())).slice(0, 10);
     }, [emojiSearch]);
 
+    const commands = useMemo(() => {
+        return availableCommands.filter((c) => c.name.toLowerCase().startsWith(slashSearch.toLowerCase())).slice(0, 10);
+    }, [slashSearch, availableCommands]);
+
     const [mentionUserId, setMentionUserId] = useState<string>("");
     const [emojiName, setEmojiName] = useState<string>("");
+    const [slashName, setSlashName] = useState<string>("");
 
     useEffect(() => {
         setMentionUserId(mentionUsers[0]?.id || "");
@@ -50,6 +70,9 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
     useEffect(() => {
         setEmojiName(emojis[0]?.key || "");
     }, [emojis]);
+    useEffect(() => {
+        setSlashName(commands[0]?.name || "");
+    }, [commands]);
 
     const initialValue = useMemo(() => {
         const rawContent = content?.toString() || "";
@@ -74,6 +97,19 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
             const beforeRange = { anchor: lineStart, focus: start };
             const beforeText = Editor.string(editor, beforeRange);
 
+            const slashMatch = beforeText.match(/^\/(\w*)$/);
+            if (slashMatch) {
+                const matchText = slashMatch[0];
+                const matchStart = Editor.before(editor, start, { distance: matchText.length, unit: "character" });
+                if (matchStart) {
+                    setSlashTarget({ anchor: matchStart, focus: start });
+                    setSlashSearch(slashMatch[1]);
+                    setMentionTarget(null);
+                    setEmojiTarget(null);
+                    return;
+                }
+            }
+
             const mentionMatch = beforeText.match(/@(\w*)$/);
             if (mentionMatch) {
                 const matchText = mentionMatch[0];
@@ -82,6 +118,7 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
                     setMentionTarget({ anchor: matchStart, focus: start });
                     setMentionSearch(mentionMatch[1]);
                     setEmojiTarget(null);
+                    setSlashTarget(null);
                     return;
                 }
             }
@@ -94,6 +131,7 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
                     setEmojiTarget({ anchor: matchStart, focus: start });
                     setEmojiSearch(emojiMatch[1]);
                     setMentionTarget(null);
+                    setSlashTarget(null);
                     return;
                 }
             }
@@ -101,6 +139,7 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
 
         setMentionTarget(null);
         setEmojiTarget(null);
+        setSlashTarget(null);
     }, [editor]);
 
     return (
@@ -141,6 +180,25 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
                     </div>
                 )}
 
+                {!readOnly && slashTarget && commands.length > 0 && (
+                    <div ref={slashRef} className={styles.typingListContainer}>
+                        {commands.map((command) => (
+                            <div key={command.name} className={styles.typingListItem} data-selected={command.name === slashName}
+                                onClick={() => {
+                                    Transforms.select(editor, slashTarget);
+                                    insertCommand(editor, command.name);
+                                    setSlashTarget(null);
+                                }}>
+                                <div>
+                                    <div>/{command.name}</div>
+                                    <div style={{ fontSize: "0.8em", opacity: 0.7 }}>{command.description}</div>
+                                    <div style={{ fontSize: "0.75em", opacity: 0.5 }}>{command.usage}</div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
                 <Editable
                     renderElement={renderElement}
                     renderLeaf={renderLeaf}
@@ -150,24 +208,32 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
                     placeholder="Type message..."
                     {...props}
                     onKeyDown={(e) => {
-                        const target = mentionTarget || emojiTarget;
+                        const target = mentionTarget || emojiTarget || slashTarget;
 
                         if (target) {
-                            const items = mentionTarget ? mentionUsers : emojis;
-                            const activeId = mentionTarget ? mentionUserId : emojiName;
+                            const items: any[] = mentionTarget ? mentionUsers : emojiTarget ? emojis : commands;
+                            const activeId = mentionTarget ? mentionUserId : emojiTarget ? emojiName : slashName;
+                            const getKey = (item: any) => mentionTarget ? item.id : emojiTarget ? item.key : item.name;
+
                             switch (e.key) {
-                                case "ArrowDown":
+                                case "ArrowDown": {
                                     e.preventDefault();
-                                    const nextIdx = items.findIndex((i) => (mentionTarget ? (i as any).id : (i as any).key) === activeId) + 1;
+                                    const nextIdx = items.findIndex((i) => getKey(i) === activeId) + 1;
                                     const next = items[nextIdx % items.length];
-                                    mentionTarget ? setMentionUserId((next as any).id) : setEmojiName((next as any).key);
+                                    if (mentionTarget) setMentionUserId(next.id);
+                                    else if (emojiTarget) setEmojiName(next.key);
+                                    else setSlashName(next.name);
                                     return;
-                                case "ArrowUp":
+                                }
+                                case "ArrowUp": {
                                     e.preventDefault();
-                                    const prevIdx = items.findIndex((i) => (mentionTarget ? (i as any).id : (i as any).key) === activeId) - 1;
+                                    const prevIdx = items.findIndex((i) => getKey(i) === activeId) - 1;
                                     const prev = items[(prevIdx + items.length) % items.length];
-                                    mentionTarget ? setMentionUserId((prev as any).id) : setEmojiName((prev as any).key);
+                                    if (mentionTarget) setMentionUserId(prev.id);
+                                    else if (emojiTarget) setEmojiName(prev.key);
+                                    else setSlashName(prev.name);
                                     return;
+                                }
                                 case "Tab":
                                 case "Enter":
                                     e.preventDefault();
@@ -177,17 +243,22 @@ export default function MarkdownEditor({ content, color, readOnly, getEditor = (
                                         if (user) {
                                             insertMention(editor, user); Transforms.insertText(editor, " ");
                                         }
-                                    } else {
+                                    } else if (emojiTarget) {
                                         const emoji = emojis.find((em) => em.key === emojiName);
                                         if (emoji) insertEmoji(editor, emoji.value);
+                                    } else {
+                                        const command = commands.find((c) => c.name === slashName);
+                                        if (command) insertCommand(editor, command.name);
                                     }
                                     setMentionTarget(null);
                                     setEmojiTarget(null);
+                                    setSlashTarget(null);
                                     return;
                                 case "Escape":
                                     e.preventDefault();
                                     setMentionTarget(null);
                                     setEmojiTarget(null);
+                                    setSlashTarget(null);
                                     return;
                             }
                         }
