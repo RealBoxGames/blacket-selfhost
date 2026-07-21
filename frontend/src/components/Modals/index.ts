@@ -8,6 +8,7 @@ import ModalButtonContainer from "./ModalButtonContainer";
 import ModalDropdownContainer from "./ModalDropdownContainer";
 import ModalHeader from "./ModalHeader";
 import ModalToggleContainer from "./ModalToggleContainer";
+import PurchaseItemShopModal from "./PurchaseItemShopModal";
 import PurchaseProductModal from "./PurchaseProductModal";
 import WelcomeModal from "./WelcomeModal";
 
@@ -22,6 +23,7 @@ export {
     ModalDropdownContainer,
     ModalHeader,
     ModalToggleContainer,
+    PurchaseItemShopModal,
     PurchaseProductModal,
     WelcomeModal
 };

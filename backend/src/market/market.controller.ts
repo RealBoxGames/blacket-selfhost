@@ -3,6 +3,8 @@ import {
     Controller,
     HttpCode,
     HttpStatus,
+    Param,
+    ParseIntPipe,
     Post,
     Put
 } from "@nestjs/common";
@@ -22,6 +24,13 @@ export class MarketController {
     async openPack(@GetCurrentUser() userId: string,
         @Body() dto: MarketOpenPackDto,) {
         return await this.marketService.openPack(userId, dto);
+    }
+
+    @Throttle({ global: { limit: 3, ttl: seconds(2) } })
+    @Post("item-shop/:id")
+    async buyFromItemShop(@GetCurrentUser() userId: string,
+        @Param("id", ParseIntPipe) id: number,) {
+        return await this.marketService.buyFromItemShop(userId, { id });
     }
 
     @Throttle({ global: { limit: 1, ttl: seconds(10) } })

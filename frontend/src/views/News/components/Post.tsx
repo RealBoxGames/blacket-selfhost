@@ -15,7 +15,7 @@ export default function Post({ post, ...props }: PostProps) {
                 <img
                     className={styles.postImage}
                     draggable={false}
-                    src={`${import.meta.env.VITE_UPLOAD_PATH}${post.image as string}`}
+                    src={post.imageUrl ? post.imageUrl : `${import.meta.env.VITE_UPLOAD_PATH}${post.image as string}`}
                 />
                 <div className={styles.postDate}>
                     <i className="fas fa-calendar-alt" />

@@ -7,7 +7,7 @@ import styles from "../market.module.scss";
 
 import { PackProps } from "../market.d";
 
-export default function Pack({ pack, ambienceEnabled = true, onClick, ...props }: PackProps) {
+export default function Pack({ pack, ambienceEnabled = true, autoOpening = false, onAutoOpenClick, onClick, ...props }: PackProps) {
     const { resourceIdToPath } = useResource();
     const { getSound, playSound, stopSound } = useSound();
 
@@ -62,6 +62,19 @@ export default function Pack({ pack, ambienceEnabled = true, onClick, ...props }
                 <img src={window.constructCDNUrl("/content/token.png")} alt="Token Icon" />
                 {pack.price.toLocaleString()}
             </div>
+
+            {onAutoOpenClick && (
+                <div
+                    className={`${styles.bottomRightText} ${autoOpening ? styles.autoOpenActive : ""}`}
+                    title={autoOpening ? "Stop Auto Open" : "Auto Open"}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onAutoOpenClick(e);
+                    }}
+                >
+                    <i className={autoOpening ? "fas fa-stop" : "fas fa-bolt"} />
+                </div>
+            )}
         </div>
     );
 }

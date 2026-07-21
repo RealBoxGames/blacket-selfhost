@@ -4,6 +4,7 @@ model NewsPost {
     content String
 
     imageId  Int?
+    imageUrl String?
     authorId String
 
     createdAt DateTime @default(now())

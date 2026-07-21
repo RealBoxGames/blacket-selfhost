@@ -75,4 +75,6 @@ export interface LeafProps {
 export interface InputContainerProps {
     placeholder: string;
     maxLength: number;
+    hideUpload?: boolean;
+    floating?: boolean;
 }

@@ -300,6 +300,21 @@
         height: 16px;
         margin-right: 7px;
     }
+
+    &:hover {
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, .4);
+    }
+}
+
+.autoOpenActive {
+    background-color: rgba(255, 200, 0, .5) !important;
+    animation: autoOpenPulse 1s infinite;
+}
+
+@keyframes autoOpenPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .6; }
 }
 
 .itemContainer {

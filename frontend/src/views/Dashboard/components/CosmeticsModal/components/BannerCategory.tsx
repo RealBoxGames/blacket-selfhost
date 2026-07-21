@@ -13,7 +13,6 @@ import { PermissionTypeEnum } from "@blacket/types";
 
 export default function BannerCategory() {
     const { user, getUserBannerPath } = useUser();
-    if (!user) return null;
 
     const [search, setSearch] = useState<string>("");
 
@@ -24,6 +23,8 @@ export default function BannerCategory() {
     const { changeBanner, changeBannerUrl } = useChangeBanner();
 
     const navigate = useNavigate();
+
+    if (!user) return null;
 
     const onSelect = (id: number) => {
         setLoading(true);

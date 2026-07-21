@@ -41,10 +41,13 @@ export default function Market() {
     const [bigButtonEvent, setBigButtonEvent] = useState<BigButtonClickType>(BigButtonClickType.CLOSE);
     const [search, setSearch] = useLocalStorageState<SearchOptions>("market:search", { query: "", onlyPurchasable: false });
     const [boosters, setBoosters] = useState<DataBoostersEntity | null>(null);
+    const [autoOpenPackId, setAutoOpenPackId] = useState<number | null>(null);
 
     const particleCanvasRef = useRef<ParticleCanvasRef>(null);
     const spotlightDimmerRef = useRef<HTMLDivElement>(null);
     const isPlayingRef = useRef(isPlaying);
+    const autoOpenPackIdRef = useRef<number | null>(null);
+    const userRef = useRef(user);
 
     const playRaritySound = async (r: RarityAnimationTypeEnum) => {
         if (!user.settings) return;
@@ -126,6 +129,36 @@ export default function Market() {
                 if (user.settings.openPacksInstantly) setLoading(false);
             });
     });
+
+    const stopAutoOpen = () => {
+        autoOpenPackIdRef.current = null;
+        setAutoOpenPackId(null);
+    };
+
+    const startAutoOpen = (pack: PackType) => {
+        if (autoOpenPackIdRef.current === pack.id) return stopAutoOpen();
+
+        autoOpenPackIdRef.current = pack.id;
+        setAutoOpenPackId(pack.id);
+
+        const tick = () => {
+            if (autoOpenPackIdRef.current !== pack.id) return;
+
+            if (userRef.current.tokens < pack.price) {
+                stopAutoOpen();
+                createModal(<Modal.ErrorModal>You do not have enough tokens to keep auto opening.</Modal.ErrorModal>);
+                return;
+            }
+
+            openPack({ packId: pack.id })
+                .catch(() => stopAutoOpen())
+                .finally(() => {
+                    if (autoOpenPackIdRef.current === pack.id) setTimeout(tick, 750);
+                });
+        };
+
+        tick();
+    };
 
     const handleBigClick = async () => {
         if (!unlockedBlook) return;
@@ -221,6 +254,16 @@ export default function Market() {
     }, [isPlaying]);
 
     useEffect(() => {
+        userRef.current = user;
+    }, [user]);
+
+    useEffect(() => {
+        return () => {
+            autoOpenPackIdRef.current = null;
+        };
+    }, []);
+
+    useEffect(() => {
         getBoosters()
             .then((res) => setBoosters(res.data));
 
@@ -304,14 +347,18 @@ export default function Market() {
                             {packs
                                 .filter((pack) => pack.enabled)
                                 .map((pack) =>
-                                    <Pack key={pack.id} pack={pack} ambienceEnabled={!currentPack} onClick={() => {
-                                        if (!user.settings.openPacksInstantly) createModal(<OpenPackModal
-                                            pack={pack}
-                                            userTokens={user.tokens}
-                                            onYesButton={() => purchasePack({ packId: pack.id })}
-                                        />);
-                                        else purchasePack({ packId: pack.id });
-                                    }}
+                                    <Pack key={pack.id} pack={pack} ambienceEnabled={!currentPack}
+                                        autoOpening={autoOpenPackId === pack.id}
+                                        onAutoOpenClick={() => startAutoOpen(pack)}
+                                        onClick={() => {
+                                            if (autoOpenPackId) return;
+                                            if (!user.settings.openPacksInstantly) createModal(<OpenPackModal
+                                                pack={pack}
+                                                userTokens={user.tokens}
+                                                onYesButton={() => purchasePack({ packId: pack.id })}
+                                            />);
+                                            else purchasePack({ packId: pack.id });
+                                        }}
                                         style={{
                                             display: pack.name.toLowerCase().includes(search.query.toLowerCase())
                                                 && (!search.onlyPurchasable || user.tokens >= pack.price)
@@ -336,22 +383,19 @@ export default function Market() {
 
                     <Category header="Weekly Shop">
                         <div className={styles.itemShopContainer}>
-                            {/* todo: item shop (Bleh :P <[tboyj]) */}
                             {(() => {
                                 const nonWeeklyItems = itemShop.filter((entry) => !entry.weekly);
 
-                                return nonWeeklyItems.length > 0 ? nonWeeklyItems.map((entry) => <Item itemShop={entry} key={entry.id}></Item>) : "No items found." // no items found works
+                                return nonWeeklyItems.length > 0 ? nonWeeklyItems.map((entry) => <Item itemShop={entry} key={entry.id} onClick={() => createModal(<Modal.PurchaseItemShopModal itemShop={entry} />)}></Item>) : "No items found." // no items found works
                             })()}
                         </div>
                     </Category>
-                    {/* TODO: Test values by adding data to the ItemShop table. */}
                     <Category header="Item Shop">
                         <div className={styles.itemShopContainer}>
-                            {/* TODO: item shop */}
                             {(() => {
                                 const weeklyItems = itemShop.filter((entry) => entry.weekly);
 
-                                return weeklyItems.length > 0 ? weeklyItems.map((entry) => <Item itemShop={entry} key={entry.id}></Item>) : "No items found." // no items found works
+                                return weeklyItems.length > 0 ? weeklyItems.map((entry) => <Item itemShop={entry} key={entry.id} onClick={() => createModal(<Modal.PurchaseItemShopModal itemShop={entry} />)}></Item>) : "No items found." // no items found works
                             })()}
                         </div>
                     </Category>

@@ -457,6 +457,7 @@ export interface NewsPost {
   title: string;
   content: string;
   imageId: number | null;
+  imageUrl: string | null;
   authorId: string;
   createdAt: Date;
   updatedAt: Date;

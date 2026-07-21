@@ -857,7 +857,7 @@ export default function TradingPlaza() {
                 }}
             />
 
-            <InputContainer placeholder="Message Trading Plaza..." maxLength={2048} />
+            <InputContainer placeholder="Message Trading Plaza..." maxLength={2048} hideUpload floating />
         </div>
     );
 }

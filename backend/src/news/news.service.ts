@@ -17,6 +17,7 @@ export class NewsService {
                 title: dto.title,
                 content: dto.content,
                 imageId: dto.imageId,
+                imageUrl: dto.imageUrl,
                 authorId: requesterId
             }
         });

@@ -14,6 +14,7 @@ export class NewsNewsPostEntity {
     content: string;
 
     image: string | Upload;
+    imageUrl?: string | null;
 
     author: PublicUser | User;
 

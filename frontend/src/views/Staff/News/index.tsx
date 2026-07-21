@@ -6,7 +6,7 @@ import styles from "../staff.module.scss";
 
 import { PermissionTypeEnum } from "@blacket/types";
 
-type NewsPost = { id: number; title: string; content: string; createdAt: string };
+type NewsPost = { id: number; title: string; content: string; imageUrl?: string | null; createdAt: string };
 
 export default function StaffNewsPage() {
     const { user } = useUser();
@@ -17,6 +17,7 @@ export default function StaffNewsPage() {
 
     const [title, setTitle] = useState<string>("");
     const [content, setContent] = useState<string>("");
+    const [imageUrl, setImageUrl] = useState<string>("");
     const [creating, setCreating] = useState<boolean>(false);
 
     if (!user || !user.hasPermission(PermissionTypeEnum.MANAGE_DATA)) return <Navigate to="/login" />;
@@ -40,10 +41,11 @@ export default function StaffNewsPage() {
         setCreating(true);
         setError("");
 
-        window.fetch2.post("/api/news", { title, content })
+        window.fetch2.post("/api/news", { title, content, imageUrl: imageUrl.trim() || undefined })
             .then(() => {
                 setTitle("");
                 setContent("");
+                setImageUrl("");
                 refresh();
             })
             .catch((res: Fetch2Response) => setError(res.data?.message ?? "Failed to create news post."))
@@ -63,6 +65,7 @@ export default function StaffNewsPage() {
 
                 <Input placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
                 <Input placeholder="Content" value={content} onChange={(e) => setContent(e.target.value)} />
+                <Input placeholder="Image URL (optional)" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
 
                 {error !== "" && <ErrorContainer>{error}</ErrorContainer>}
 

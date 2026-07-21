@@ -17,9 +17,8 @@ const disabledStyles: CSSProperties = {
 
 export default function ColorCategory() {
     const { user } = useUser();
-    if (!user) return null;
 
-    const [color, setColor] = useState<string>(user.color);
+    const [color, setColor] = useState<string>(user?.color ?? "#ffffff");
 
     const { closeModal } = useModal();
     const { setLoading } = useLoading();
@@ -27,6 +26,8 @@ export default function ColorCategory() {
     const { changeColorTier1 } = useChangeColor();
 
     const navigate = useNavigate();
+
+    if (!user) return null;
 
     return (
         <div className={styles.holder} data-column={true}>

@@ -1,4 +1,4 @@
-import { HTMLAttributes, ReactNode } from "react";
+import { HTMLAttributes, MouseEvent, ReactNode } from "react";
 import { DataBoostersEntity, ItemShop, MarketOpenPackDto, Pack, RarityAnimationType, UserBlook } from "@blacket/types";
 
 export enum BigButtonClickType {
@@ -25,6 +25,8 @@ export interface CategoryProps extends HTMLAttributes<HTMLDivElement> {
 export interface PackProps extends HTMLAttributes<HTMLDivElement> {
     pack: Pack;
     ambienceEnabled?: boolean;
+    autoOpening?: boolean;
+    onAutoOpenClick?: (e: MouseEvent) => void;
 }
 
 export interface ItemProps extends HTMLAttributes<HTMLDivElement> {

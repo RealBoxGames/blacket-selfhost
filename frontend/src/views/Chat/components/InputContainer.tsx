@@ -15,7 +15,7 @@ import { PermissionTypeEnum } from "@blacket/types";
 
 const isMobile = () => window.innerWidth <= 768;
 
-export default memo(function InputContainer({ placeholder }: InputContainerProps) {
+export default memo(function InputContainer({ placeholder, hideUpload, floating }: InputContainerProps) {
     const { user } = useUser();
     if (!user) return null;
 
@@ -107,7 +107,7 @@ export default memo(function InputContainer({ placeholder }: InputContainerProps
     const openColorPickerModal = () => createModal(<ChangeChatColorModal />);
 
     return (
-        <div className={styles.messageForm}>
+        <div className={`${styles.messageForm} ${floating ? styles.messageFormFloating : ""}`}>
             <UsersTypingContainer />
 
             <div
@@ -128,7 +128,7 @@ export default memo(function InputContainer({ placeholder }: InputContainerProps
             </div>
 
             <div className={styles.leftInputButtonsContainer}>
-                {user.hasPermission(PermissionTypeEnum.UPLOAD_FILES_SMALL) && <FileUploadContainer />}
+                {!hideUpload && user.hasPermission(PermissionTypeEnum.UPLOAD_FILES_SMALL) && <FileUploadContainer />}
             </div>
 
             {isMobile() ? (

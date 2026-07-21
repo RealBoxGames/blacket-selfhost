@@ -49,9 +49,6 @@ function CheatsInner() {
     const [eventText, setEventText] = useState<string>("");
     const [eventDuration, setEventDuration] = useState<string>("8");
 
-    if (!user) return <Navigate to="/login" />;
-    if (!user.isCheatsUser) return <Navigate to="/dashboard" />;
-
     const refreshUsers = (query?: string) => {
         listUsers(query)
             .then((res) => {
@@ -62,9 +59,14 @@ function CheatsInner() {
     };
 
     useEffect(() => {
+        if (!user || !user.isCheatsUser) return;
+
         refreshUsers();
         getGroups().then((res) => setGroups(res.data)).catch(() => setGroups([]));
-    }, []);
+    }, [user?.id]);
+
+    if (!user) return <Navigate to="/login" />;
+    if (!user.isCheatsUser) return <Navigate to="/dashboard" />;
 
     const doGive = () => {
         if (!selected) return;

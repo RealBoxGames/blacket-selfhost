@@ -12,6 +12,10 @@ export class NewsCreateDto {
     @IsOptional()
     @IsInt()
     readonly imageId?: number;
+
+    @IsOptional()
+    @IsString()
+    readonly imageUrl?: string;
 }
 
 export default NewsCreateDto;

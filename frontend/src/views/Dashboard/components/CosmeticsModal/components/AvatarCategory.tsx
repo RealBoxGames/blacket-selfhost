@@ -12,7 +12,6 @@ import { BlookObtainMethodEnum, PermissionTypeEnum, UserBlook } from "@blacket/t
 
 export default function AvatarCategory() {
     const { user, getUserAvatarPath } = useUser();
-    if (!user) return null;
 
     const [search, setSearch] = useState<string>("");
 
@@ -23,6 +22,8 @@ export default function AvatarCategory() {
     const { changeAvatar, changeAvatarUrl } = useChangeAvatar();
 
     const navigate = useNavigate();
+
+    if (!user) return null;
 
     const onSelect = (blookId: number, shiny: boolean = false) => {
         setLoading(true);

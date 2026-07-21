@@ -25,9 +25,8 @@ const hexIsLight = (hex: string) => {
 
 export default function GradientCategory() {
     const { user } = useUser();
-    if (!user) return null;
 
-    const [userColor, setUserColor] = useState<string>(user.color);
+    const [userColor, setUserColor] = useState<string>(user?.color ?? "#ffffff");
     const [color, setColor] = useState<string>("#ffffff");
     const [points, setPoints] = useState<GradientPoint[]>([
         { color: "#000000", position: 0 },
@@ -124,8 +123,12 @@ export default function GradientCategory() {
 
     // initialize the gradient points from user color
     useEffect(() => {
+        if (!user) return;
+
         userColorStringToGradientPoints(user.color);
     }, []);
+
+    if (!user) return null;
 
     return (
         <div className={styles.holder} data-column={true}>
